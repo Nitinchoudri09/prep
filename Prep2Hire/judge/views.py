@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from .models import Problem, Submission, TestCase
 from .forms import SubmissionForm
 import json
@@ -81,3 +83,29 @@ def submission_result(request, submission_id):
     except Exception:
         details = [{"error": "No details"}]
     return render(request, "judge/submission_result.html", {"submission": sub, "details": details})
+
+
+@csrf_exempt
+def run_code(request, slug):
+    """AJAX endpoint — run code with custom user-provided stdin, return output as JSON."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        body = json.loads(request.body)
+        code = body.get("code", "")
+        stdin = body.get("stdin", "")
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    if not code.strip():
+        return JsonResponse({"stdout": "", "stderr": "No code provided.", "exit_code": -1, "time_taken": 0})
+
+    exit_code, stdout, stderr, time_taken = run_python_code(code, stdin)
+
+    return JsonResponse({
+        "stdout": stdout,
+        "stderr": stderr,
+        "exit_code": exit_code,
+        "time_taken": round(time_taken, 3),
+    })

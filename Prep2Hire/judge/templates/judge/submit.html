@@ -3,113 +3,658 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Submit Solution - {{ problem.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ problem.title }} — Code Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
     <style>
-        /* Base dark background & text */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-panel: #1c2333;
+            --bg-input: #21262d;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent-hover: #79b8ff;
+            --green: #3fb950;
+            --red: #f85149;
+            --yellow: #d29922;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #0f172a; /* very dark navy */
-            color: #e0e7ff; /* light blueish text */
-            margin: 0;
-            padding: 40px 20px;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .container {
-            max-width: 1250px;
-            width: 100%;
-            background-color: #113773ff; /* dark slate */
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(30, 58, 138, 0.7);
-            padding: 30px 40px;
+        /* ── Top Nav ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            height: 52px;
+            flex-shrink: 0;
+            gap: 12px;
         }
 
-        h2 {
-            font-family: 'Roboto', sans-serif;
-            color: #ffffffff; /* soft blue */
-            font-size: 2.4rem;
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-top: 0;
-            margin-bottom: 16px;
-            border-bottom: 3px solid #2563eb;
-            padding-bottom: 8px;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            white-space: nowrap;
         }
 
-        p.text-muted {
-            color: #94a3b8; /* muted gray-blue */
-            font-size: 1.05rem;
-            margin-bottom: 28px;
+        .problem-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-left: 1px solid var(--border);
+            padding-left: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 380px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ── Language badge ── */
+        .lang-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-run {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-run:hover { background: #2d333b; border-color: var(--accent); color: var(--accent); }
+        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-submit {
+            background: var(--green);
+            color: #000;
+        }
+        .btn-submit:hover { background: #56d364; transform: translateY(-1px); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-back:hover { color: var(--text-primary); border-color: #58a6ff44; }
+
+        /* ── Main Layout ── */
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 0;
+        }
+
+        /* ── LEFT: Problem Description ── */
+        .panel-problem {
+            width: 360px;
+            min-width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            flex-shrink: 0;
+        }
+
+        .panel-tab {
+            padding: 11px 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .panel-tab.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .problem-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .problem-desc {
+            font-size: 0.9rem;
+            line-height: 1.75;
+            color: var(--text-secondary);
             white-space: pre-wrap;
         }
 
-        form {
+        .problem-desc code {
+            background: var(--bg-input);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82rem;
+            color: #ffa657;
+        }
+
+        /* ── RIGHT: Editor + IO ── */
+        .panel-editor {
+            flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
+        /* Editor toolbar */
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0 16px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .editor-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-red { background: #f85149; }
+        .dot-yellow { background: #d29922; }
+        .dot-green { background: #3fb950; }
+
+        /* Ace Editor area */
         #editor {
-            height: 400px;
-            border-radius: 8px;
-            border: 1.5px solid #2563eb;
+            flex: 1;
+            min-height: 200px;
             font-size: 14px;
-            box-shadow: inset 0 0 10px #2563eb;
-            margin-bottom: 24px;
         }
 
-        button[type="submit"] {
-            align-self: flex-start;
-            background-color: #2563eb;
-            color: #f0f9ff;
-            border: none;
-            padding: 12px 28px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border-radius: 8px;
+        /* ── Bottom IO Panel ── */
+        .io-panel {
+            height: 260px;
+            min-height: 180px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-secondary);
+            flex-shrink: 0;
+        }
+
+        .io-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            flex-shrink: 0;
+            align-items: center;
+            padding: 0 12px;
+            height: 38px;
+            gap: 4px;
+        }
+
+        .io-tab {
+            padding: 5px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            border-radius: 6px 6px 0 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
             user-select: none;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.6);
+        }
+        .io-tab.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+            background: var(--bg-input);
         }
 
-        button[type="submit"]:hover,
-        button[type="submit"]:focus {
-            background-color: #3b82f6;
+        .io-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .io-pane {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .io-pane.active { display: flex; }
+
+        textarea.io-textarea {
+            flex: 1;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: none;
+            padding: 12px 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            resize: none;
             outline: none;
+            line-height: 1.6;
+        }
+        textarea.io-textarea::placeholder { color: var(--text-muted); }
+
+        /* Output Display */
+        .output-display {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            background: var(--bg-input);
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .output-placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .output-stdout { color: #e6edf3; white-space: pre-wrap; word-break: break-word; }
+        .output-stderr { color: var(--red); white-space: pre-wrap; word-break: break-word; }
+
+        .output-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .badge-success { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.4); }
+        .badge-error   { background: rgba(248,81,73,0.15);  color: var(--red);   border: 1px solid rgba(248,81,73,0.4); }
+        .badge-tle     { background: rgba(210,153,34,0.15); color: var(--yellow); border: 1px solid rgba(210,153,34,0.4); }
+
+        .time-info {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Hidden form for submit */
+        #submit-form { display: none; }
+
+        /* Resize handle between panels */
+        .resize-handle {
+            width: 4px;
+            background: var(--border);
+            cursor: col-resize;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .resize-handle:hover { background: var(--accent); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+        /* Mobile fallback */
+        @media (max-width: 768px) {
+            .panel-problem { display: none; }
+            .problem-title { display: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>{{ problem.title }}</h2>
-    <div>Write your Python code here</div>
+<!-- ═══ TOP NAV ═══ -->
+<nav class="topbar">
+    <div class="topbar-left">
+        <span class="logo">⚡ Code Pro</span>
+        <span class="problem-title">{{ problem.title }}</span>
+    </div>
+    <div class="topbar-right">
+        <div class="lang-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#ffd700"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+            Python 3
+        </div>
+        <a href="{% url 'judge:problem_list' %}" class="btn btn-back">← Problems</a>
+        <button class="btn btn-run" id="btn-run" onclick="runCode()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Run Code
+        </button>
+        <button class="btn btn-submit" id="btn-submit" onclick="submitCode()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            Submit
+        </button>
+    </div>
+</nav>
 
-    <p class="text-muted">{{ problem.description|linebreaks }}</p>
+<!-- Hidden submit form -->
+<form id="submit-form" method="post" action="{% url 'judge:submit_solution' slug=problem.slug %}">
+    {% csrf_token %}
+    <textarea name="code" id="code-hidden"></textarea>
+</form>
 
-    <form method="post">
-        {% csrf_token %}
-        <!-- Hidden textarea to hold Ace content -->
-        <textarea name="code" id="code" style="display:none;"></textarea>
+<!-- ═══ WORKSPACE ═══ -->
+<div class="workspace">
 
-        <div id="editor"># Write your Python code here</div>
+    <!-- LEFT: Problem Panel -->
+    <div class="panel-problem" id="panel-problem">
+        <div class="panel-tabs">
+            <div class="panel-tab active" onclick="switchProblemTab(this, 'desc')">Description</div>
+        </div>
+        <div class="panel-content" id="tab-desc">
+            <div class="problem-name">{{ problem.title }}</div>
+            <div class="problem-desc">{{ problem.description }}</div>
+        </div>
+    </div>
 
-        <button type="submit">Run Code</button>
-    </form>
+    <!-- Resize handle -->
+    <div class="resize-handle" id="resize-handle"></div>
+
+    <!-- RIGHT: Editor + IO -->
+    <div class="panel-editor">
+
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar">
+            <div class="editor-toolbar-left">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+                <span style="margin-left:8px; font-size:0.78rem;">solution.py</span>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">
+                <kbd style="background:var(--bg-input);border:1px solid var(--border);padding:2px 6px;border-radius:3px;font-size:0.7rem;">Ctrl+Enter</kbd> Run
+                &nbsp;·&nbsp;
+                <kbd style="background:var(--bg-input);border:1px solid var(--border);padding:2px 6px;border-radius:3px;font-size:0.7rem;">Ctrl+Shift+Enter</kbd> Submit
+            </div>
+        </div>
+
+        <!-- Ace Editor -->
+        <div id="editor"># Write your Python solution here
+# Read input with: line = input()
+# Print output with: print(answer)
+
 </div>
+
+        <!-- ── IO PANEL ── -->
+        <div class="io-panel">
+            <div class="io-tabs">
+                <div class="io-tab active" id="tab-input-btn"  onclick="switchIOTab('input')">📥 Input</div>
+                <div class="io-tab"        id="tab-output-btn" onclick="switchIOTab('output')">📤 Output</div>
+                <div style="flex:1"></div>
+                <span id="run-status" style="font-size:0.75rem; color:var(--text-muted);"></span>
+            </div>
+            <div class="io-body">
+                <!-- Input pane -->
+                <div class="io-pane active" id="pane-input">
+                    <textarea class="io-textarea" id="stdin-textarea"
+                        placeholder="Enter your custom input here...&#10;Example: 5&#10;1 2 3 4 5"></textarea>
+                </div>
+                <!-- Output pane -->
+                <div class="io-pane" id="pane-output">
+                    <div class="output-display" id="output-display">
+                        <span class="output-placeholder">Run your code to see output here.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /panel-editor -->
+</div><!-- /workspace -->
 
 <!-- Ace Editor -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.4/ace.js"></script>
 <script>
+    // ═══ Ace Editor Setup ═══
     var editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai");  // Dark theme
+    editor.setTheme("ace/theme/one_dark");
     editor.session.setMode("ace/mode/python");
-
-    // Before form submit, copy code from Ace to hidden textarea
-    document.querySelector("form").addEventListener("submit", function(){
-        document.getElementById("code").value = editor.getValue();
+    editor.setOptions({
+        fontSize: "14px",
+        fontFamily: "'Fira Code', monospace",
+        showPrintMargin: false,
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true,
+        tabSize: 4,
+        useSoftTabs: true,
     });
+    editor.container.style.lineHeight = 1.65;
+
+    // ═══ IO Tab switcher ═══
+    function switchIOTab(tab) {
+        document.querySelectorAll('.io-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.io-pane').forEach(p => p.classList.remove('active'));
+        if (tab === 'input') {
+            document.getElementById('tab-input-btn').classList.add('active');
+            document.getElementById('pane-input').classList.add('active');
+        } else {
+            document.getElementById('tab-output-btn').classList.add('active');
+            document.getElementById('pane-output').classList.add('active');
+        }
+    }
+
+    // ═══ Problem Tab switcher ═══
+    function switchProblemTab(el, tab) {
+        document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    // ═══ Run Code (AJAX) ═══
+    const RUN_URL = "{% url 'judge:run_code' slug=problem.slug %}";
+
+    async function runCode() {
+        const code  = editor.getValue();
+        const stdin = document.getElementById('stdin-textarea').value;
+
+        // Switch to output tab
+        switchIOTab('output');
+
+        // Show loading state
+        const btn = document.getElementById('btn-run');
+        const statusEl = document.getElementById('run-status');
+        const outputEl = document.getElementById('output-display');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Running…';
+        statusEl.textContent = '';
+        outputEl.innerHTML = '<span class="output-placeholder"><span class="spinner"></span> Executing your code…</span>';
+
+        try {
+            const resp = await fetch(RUN_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, stdin }),
+            });
+
+            const data = await resp.json();
+            renderOutput(data);
+
+        } catch (err) {
+            outputEl.innerHTML = `<span class="output-stderr">⚠ Network error: ${err.message}</span>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Run Code';
+        }
+    }
+
+    function renderOutput(data) {
+        const outputEl = document.getElementById('output-display');
+        const statusEl = document.getElementById('run-status');
+        let html = '';
+
+        if (data.exit_code === null) {
+            // TLE
+            html += `<div class="output-badge badge-tle">⏱ Time Limit Exceeded</div>\n`;
+            statusEl.innerHTML = '<span style="color:var(--yellow)">⏱ TLE</span>';
+        } else if (data.exit_code !== 0) {
+            // Runtime error
+            html += `<div class="output-badge badge-error">✗ Runtime Error</div>\n`;
+            statusEl.innerHTML = '<span style="color:var(--red)">✗ Error</span>';
+        } else {
+            html += `<div class="output-badge badge-success">✓ Executed Successfully</div>\n`;
+            statusEl.innerHTML = '<span style="color:var(--green)">✓ Done</span>';
+        }
+
+        if (data.stdout && data.stdout.trim()) {
+            html += `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;">STDOUT</div>`;
+            html += `<div class="output-stdout">${escHtml(data.stdout)}</div>`;
+        } else if (data.exit_code === 0) {
+            html += `<div class="output-stdout" style="color:var(--text-muted);font-style:italic;">(no output)</div>`;
+        }
+
+        if (data.stderr && data.stderr.trim()) {
+            html += `<div style="font-size:0.75rem;color:var(--text-muted);margin:10px 0 4px;">STDERR</div>`;
+            html += `<div class="output-stderr">${escHtml(data.stderr)}</div>`;
+        }
+
+        if (data.time_taken !== undefined) {
+            html += `<div class="time-info">⏱ Execution time: ${data.time_taken}s</div>`;
+        }
+
+        outputEl.innerHTML = html;
+    }
+
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ═══ Submit Code (form POST) ═══
+    function submitCode() {
+        const code = editor.getValue();
+        if (!code.trim()) {
+            alert('Please write some code before submitting.');
+            return;
+        }
+        document.getElementById('code-hidden').value = code;
+        document.getElementById('submit-form').submit();
+
+        const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Submitting…';
+    }
+
+    // ═══ Keyboard shortcuts ═══
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
+            e.preventDefault();
+            submitCode();
+        } else if (e.ctrlKey && !e.shiftKey && e.key === 'Enter') {
+            e.preventDefault();
+            runCode();
+        }
+    });
+
+    // ═══ Resize panel handle ═══
+    (function() {
+        const handle  = document.getElementById('resize-handle');
+        const panel   = document.getElementById('panel-problem');
+        let dragging  = false;
+        let startX, startW;
+
+        handle.addEventListener('mousedown', e => {
+            dragging = true;
+            startX   = e.clientX;
+            startW   = panel.offsetWidth;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+        document.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            const newW = Math.max(200, Math.min(600, startW + e.clientX - startX));
+            panel.style.width = newW + 'px';
+        });
+        document.addEventListener('mouseup', () => {
+            dragging = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+    })();
 </script>
 
 </body>
