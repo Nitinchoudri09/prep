@@ -169,6 +169,7 @@
                 <div class="dropdown" id="dropdownMenu">
                   <span class="dropdown-trigger btn btn-primary" onclick="toggleDropdown()">Welcome, {{ user.username }}</span>
                     <div class="dropdown-content">
+                      <a href="{% url 'change_password' %}">Change Password</a>
                       <a href="{% url 'logout' %}">Logout</a>
                       <form action="{% url 'delete_account' %}" method="post" style="margin: 0; padding: 5px 15px;">
                         {% csrf_token %}
