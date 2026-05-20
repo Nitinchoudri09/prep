@@ -2,293 +2,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>User Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Font Awesome Cdn Link -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - Prep2Hire</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Modern line icons using Boxicons -->
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   <style>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700");
-*{
-  margin: 0;
-  padding: 0;
-  outline: none;
-  border: none;
-  text-decoration: none;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
-body{
-  background: #dfe9f5;
-}
-.container{
-  display: flex;
-}
-nav{
-  position: relative;
-  top: 0;
-  bottom: 0;
-  height: 100vh;
-  left: 0;
-  background: #fff;
-  width: 280px;
-  overflow: hidden;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-}
-.logo{
-  text-align: center;
-  display: flex;
-  margin: 10px 0 0 10px;
-}
-.logo img{
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-}
-.logo span{
-  font-weight: bold;
-  padding-left: 15px;
-  font-size: 18px;
-  text-transform: uppercase;
-}
-nav a{
-  position: relative;
-  color: rgb(85, 83, 83);
-  font-size: 14px;
-  display: table;
-  width: 280px;
-  padding: 10px;
-}
-nav .fas{
-  position: relative;
-  width: 70px;
-  height: 40px;
-  top: 14px;
-  font-size: 20px;
-  text-align: center;
-}
-.nav-item{
-  position: relative;
-  top: 12px;
-  margin-left: 10px;
-}
-{% comment %} a:hover{
-  background: #eee;
-} {% endcomment %}
-.logout{
-  position: absolute;
-  bottom: 0;
-}
+    /* CSS Reset and Variables */
+    :root {
+      --bg-color: #f8fafc;
+      --sidebar-width: 260px;
+      --primary: #2563eb;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --card-bg: #ffffff;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); display: flex; min-height: 100vh; overflow-x: hidden; }
+    
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-width); background: var(--card-bg); height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); padding: 25px 20px; z-index: 100; overflow-y: auto;}
+    
+    .logo-container { background: var(--primary); color: white; padding: 16px 20px; border-radius: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 35px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); }
+    .logo-container i { font-size: 26px; color: #fbbf24; }
+    .logo-container span { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.3px; }
 
-/* Main Section */
-.main{
-  position: relative;
-  padding: 20px;
-  width: 100%;
-}
-.main-top{
-  display: flex;
-  width: 100%;
-}
-.main-top i{
-  position: absolute;
-  right: 0;
-  margin: 10px 30px;
-  color: rgb(110, 109, 109);
-  cursor: pointer;
-}
-.main-skills{
-  display: flex;
-  margin-top: 20px;
-}
-.main-skills .card{
-  width: 25%;
-  margin: 10px;
-  background: #fff;
-  text-align: center;
-  border-radius: 20px;
-  padding: 10px;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-}
-.main-skills .card h3{
-  margin: 10px;
-  text-transform: capitalize;
-}
-.main-skills .card p{
-  font-size: 12px;
-}
-.main-skills .card button{
-  background: orangered;
-  color: #fff;
-  padding: 7px 15px;
-  border-radius: 10px;
-  margin-top: 15px;
-  cursor: pointer;
-}
-.main-skills .card button:hover{
-  background: rgba(223, 70, 15, 0.856);
-}
-.main-skills .card i{
-  font-size: 22px;
-  padding: 10px;
-}
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .nav-links li a { display: flex; align-items: center; gap: 15px; padding: 13px 18px; color: var(--text-muted); text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 0.95rem; transition: all 0.2s; }
+    .nav-links li a:hover { background: #f1f5f9; color: var(--text-dark); }
+    .nav-links li a.active { background: #eff6ff; color: var(--primary); }
+    .nav-links li a i { font-size: 22px; }
 
-/* Courses */
-.main-course{
-  margin-top:20px ;
-  text-transform: capitalize;
-}
-.course-box{
-  width: 100%;
-  height: 300px;
-  padding: 10px 10px 30px 10px;
-  margin-top: 10px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-}
-.course-box ul{
-  list-style: none;
-  display: flex;
-}
-.course-box ul li{
-  margin: 10px;
-  color: gray;
-  cursor: pointer;
-}
-.course-box ul .active{
-  color: #000;
-  border-bottom: 1px solid #000;
-}
-.course-box .course{
-  display: flex;
-}
-.box{
-  width: 33%;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-  background: rgb(235, 233, 233);
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-}
-.box p{
-  font-size: 12px;
-  margin-top: 5px;
-}
-.box button{
-  background: #000;
-  color: #fff;
-  padding: 7px 10px;
-  border-radius: 10px;
-  margin-top: 3rem;
-  cursor: pointer;
-}
-.box button:hover{
-  background: rgba(0, 0, 0, 0.842);
-}
-.box i{
-  font-size: 7rem;
-  float: right;
-  margin: -20px 20px 20px 0;
-}
-.html{
-  color: rgb(25, 94, 54);
-}
-.css{
-  color: rgb(104, 179, 35);
-}
-.js{
-  color: rgb(28, 98, 179);
-}
+    .sidebar-footer { margin-top: auto; padding-top: 20px; }
+    .help-card { background: #f8fafc; padding: 16px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; border: 1px solid var(--border-color); }
+    .help-card i { background: #e0e7ff; color: var(--primary); padding: 12px; border-radius: 50%; font-size: 20px; }
+    .help-card div h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 2px; }
+    .help-card div p { font-size: 0.75rem; color: var(--text-muted); }
 
+    .logout-btn { display: flex; align-items: center; gap: 12px; padding: 12px 18px; color: var(--primary); text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 0.95rem; transition: background 0.2s; }
+    .logout-btn:hover { background: #eff6ff; }
+    .logout-btn i { font-size: 22px; }
+
+    /* Main Content */
+    .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 35px 45px; display: flex; flex-direction: column; gap: 35px; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .header-text h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+    .header-text p { font-size: 1rem; color: var(--text-muted); margin-top: 6px; }
+    
+    .header-right { display: flex; align-items: center; gap: 24px; }
+    .search-bar { display: flex; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 50px; padding: 12px 24px; width: 340px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .search-bar i { color: var(--text-muted); font-size: 20px; margin-right: 12px; }
+    .search-bar input { border: none; outline: none; background: transparent; width: 100%; font-size: 0.95rem; color: var(--text-dark); font-weight: 500; }
+    .search-bar input::placeholder { color: #94a3b8; font-weight: 400; }
+    
+    .profile-group { display: flex; align-items: center; gap: 18px; }
+    .notif-btn { background: var(--card-bg); border: 1px solid var(--border-color); width: 48px; height: 48px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-dark); font-size: 22px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .notif-badge { position: absolute; top: 12px; right: 12px; width: 10px; height: 10px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; }
+    .profile-avatar { width: 44px; height: 44px; border-radius: 50%; background: #a855f7; color: white; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 1.2rem; }
+    .profile-name { font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+    /* Stats Row */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+    .stat-card { background: var(--card-bg); padding: 25px; border-radius: 18px; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(226, 232, 240, 0.6); }
+    .stat-icon { width: 65px; height: 65px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 30px; }
+    .icon-blue { background: #eff6ff; color: #3b82f6; }
+    .icon-green { background: #f0fdf4; color: #22c55e; }
+    .icon-purple { background: #faf5ff; color: #a855f7; }
+    .icon-orange { background: #fff7ed; color: #f97316; }
+    .stat-info h3 { font-size: 1.7rem; font-weight: 800; color: var(--text-dark); line-height: 1.2; }
+    .stat-info p { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin: 2px 0 8px; }
+    .stat-trend { font-size: 0.8rem; font-weight: 600; color: #16a34a; display: flex; align-items: center; gap: 4px; }
+
+    /* Section Headings */
+    .section-heading { font-size: 1.35rem; font-weight: 800; color: var(--text-dark); margin-bottom: 20px; letter-spacing: -0.3px; }
+
+    /* Features Grid */
+    .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+    .feature-card { background: var(--card-bg); border-radius: 18px; padding: 25px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(226, 232, 240, 0.6); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .feature-left { display: flex; gap: 18px; align-items: center; }
+    .f-icon { width: 55px; height: 55px; border-radius: 14px; background: #f1f5f9; display: flex; justify-content: center; align-items: center; font-size: 26px; color: var(--primary); }
+    .feature-text h4 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .feature-text p { font-size: 0.85rem; color: var(--text-muted); max-width: 220px; line-height: 1.5; }
+    .btn-get-started { background: var(--primary); color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+    .btn-get-started:hover { background: #1e40af; transform: translateY(-1px); }
+    .feature-card i.bx-chevron-right { font-size: 26px; color: #cbd5e1; }
+
+    /* Bottom Grid */
+    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+    .panel { background: var(--card-bg); border-radius: 18px; padding: 30px; border: 1px solid rgba(226, 232, 240, 0.6); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .panel-header { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 25px; }
+    .panel-header i { color: var(--primary); font-size: 24px; }
+
+    /* Todo List */
+    .todo-input-bar { display: flex; gap: 12px; margin-bottom: 25px; }
+    .todo-input-bar input { flex: 1; padding: 14px 18px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 0.95rem; font-family: inherit; outline: none; transition: border 0.2s; }
+    .todo-input-bar input:focus { border-color: var(--primary); }
+    .todo-input-bar button { background: var(--primary); color: white; border: none; padding: 0 24px; border-radius: 10px; font-weight: 600; font-family: inherit; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+    
+    .todo-list { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+    .todo-item { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 18px; }
+    .todo-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .todo-left { display: flex; align-items: center; gap: 14px; }
+    .todo-left i { font-size: 24px; color: #cbd5e1; cursor: pointer; }
+    .todo-left i.bxs-check-circle { color: var(--primary); }
+    .todo-text { color: var(--text-dark); font-weight: 600; font-size: 0.95rem; }
+    
+    .todo-badge { padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-course { background: #eff6ff; color: #2563eb; }
+    .badge-quiz { background: #faf5ff; color: #9333ea; }
+    .badge-task { background: #f0fdf4; color: #16a34a; }
+    .badge-project { background: #fff7ed; color: #ea580c; }
+    
+    .todo-right { display: flex; align-items: center; gap: 20px; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
+    .todo-right i.bx-calendar { font-size: 18px; }
+    .todo-right i.bx-dots-vertical-rounded { font-size: 20px; color: #94a3b8; }
+    
+    /* Activity Feed */
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: 24px; }
+    .activity-item { display: flex; gap: 16px; align-items: flex-start; }
+    .activity-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; flex-shrink: 0; }
+    .activity-content { flex: 1; margin-top: 2px; }
+    .activity-title { font-weight: 700; color: var(--text-dark); font-size: 0.95rem; }
+    .activity-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; line-height: 1.4; }
+    .activity-time { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+
+    .view-all { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); text-decoration: none; font-weight: 700; font-size: 0.9rem; margin-top: 25px; transition: color 0.2s; }
+    .view-all:hover { color: #1e40af; }
+    .view-all i { font-size: 18px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <nav>
-      <ul>
-        <li style="background-color: #1e40af;border-bottom: 1px solid #1e40af;transition: all 2s ease;border-radius: 5px;"><a href="#" class="logo">
-          <img src="{% static 'abc.png' %}" alt="ad">
-          <h2 style = "color: #fff;font-weight: bold;font-style: italic;font-size: 1.5rem;margin-right:5px">Prep2Hire</h2>
-        </a></li>
-        <li><a href="/">
-          <i class="fas fa-home" style = "color:#1e40af"></i>
-          <span class="nav-item">Home</span>
-        </a></li>
-        <li><a href="/jobs/available-jobs/">
-          <i class="fas fa-user" style = "color:#1e40af"></i>
-          <span class="nav-item">Available Jobs</span>
-        </a></li>
-        <li><a href="/jobs/roadmap/">
-          <i class="fas fa-wallet" style = "color:#1e40af"></i>
-          <span class="nav-item">Roadmap</span>
-        </a></li>
-        <li><a href="/resume-analyzer/">
-          <i class="fas fa-chart-bar" style = "color:#1e40af"></i>
-          <span class="nav-item">Resume Analysis</span>
-        </a></li>
-        <li><a href="/skill-development/trending-skills/">
-          <i class="fas fa-tasks" style = "color:#1e40af"></i>
-          <span class="nav-item">Trending Skills</span>
-        </a></li>
-        <li><a href="/jobs/save_jobs/">
-          <i class="fas fa-cog" style = "color:#1e40af"></i>
-          <span class="nav-item">Save Jobs</span>
-        </a></li>
-        <li><a href="/skill-development/courses/">
-          <i class="fas fa-question-circle" style = "color:#1e40af"></i>
-          <span class="nav-item">Courses</span>
-        </a></li>
-        <li><a href="{% url 'change_password' %}">
-          <i class="fas fa-key" style = "color:#1e40af"></i>
-          <span class="nav-item">Change Password</span>
-        </a></li>
-        <li><a href="{% url 'logout' %}" class="logout" style="color:#1e40af" onclick="return confirm('Are you sure you want to log out?');">
-          <i class="fas fa-sign-out-alt" style = "color:#1e40af"></i>
-          <span class="nav-item">Log out</span>
-        </a></li>
-      </ul>
-    </nav>
 
-    <section class="main">
-      <div class="main-top">
-        <h1>Features</h1>
-        <i class="fas fa-user-cog" style="color:#1e40af"></i>
-      </div>
-      <div class="main-skills">
-        <div class="card">
-          <i class="fas fa-laptop-code" style="color:#1e40af"></i>
-          <h3>Prep2Hire Connect</h3>
-          <p>Join Over multiple Students.</p>
-          <button onclick="location.href='/connect/'" style="background-color:#1e40af">Get Started</button>
-        </div>
-        <div class="card">
-          <i class="fab fa-wordpress" style="color:#1e40af"></i>
-          <h3>Find your Career</h3>
-          <p>Find Over 1 million Jobs.</p>
-          <button onclick="location.href='/carrer_recommendation/'" style="background-color:#1e40af">Get Started</button>
-        </div>
-        <div class="card">
-          <i class="fas fa-palette" style="color:#1e40af"></i>
-          <h3>Quizzes</h3>
-          <p>Join Over 2 million Students.</p>
-          <button onclick="location.href='/skill-development/quizzes/'" style="background-color:#1e40af">Get Started</button>
-        </div>
-        <div class="card">
-          <i class="fab fa-app-store-ios" style="color:#1e40af"></i>
-          <h3>Code Pro</h3>
-          <p>Get Hundreds of Questions.</p>
-          <button onclick="location.href='/coding/'" style="background-color:#1e40af">Get Started</button>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-container">
+      <i class='bx bxs-graduation'></i>
+      <span>Prep2Hire</span>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="/" class="active"><i class='bx bx-home-alt'></i> Home</a></li>
+      <li><a href="/jobs/available-jobs/"><i class='bx bx-briefcase'></i> Available Jobs</a></li>
+      <li><a href="/jobs/roadmap/"><i class='bx bx-map-alt'></i> Roadmap</a></li>
+      <li><a href="/resume-analyzer/"><i class='bx bx-bar-chart-alt-2'></i> Resume Analysis</a></li>
+      <li><a href="/skill-development/trending-skills/"><i class='bx bx-trending-up'></i> Trending Skills</a></li>
+      <li><a href="/jobs/save_jobs/"><i class='bx bx-bookmark'></i> Save Jobs</a></li>
+      <li><a href="/skill-development/courses/"><i class='bx bx-book-open'></i> Courses</a></li>
+      <li><a href="{% url 'change_password' %}"><i class='bx bx-key'></i> Change Password</a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="help-card">
+        <i class='bx bx-question-mark'></i>
+        <div>
+          <h4>Need Help?</h4>
+          <p>Visit our Help Center</p>
         </div>
       </div>
+      <a href="{% url 'logout' %}" class="logout-btn" onclick="return confirm('Are you sure you want to log out?');">
+        <i class='bx bx-log-out'></i> Log out
+      </a>
+    </div>
+  </aside>
 
-      <section class="main-course">
-        <h1>My courses</h1>
-        <div class="course-box">
-          {% include "todo.html" %}
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Header -->
+    <header class="header">
+      <div class="header-text">
+        <h1>Welcome back, {{ user.username|default:"Nitin" }}! 👋</h1>
+        <p>Track your preparation journey and achieve your goals.</p>
+      </div>
+      
+      <div class="header-right">
+        <div class="search-bar">
+          <i class='bx bx-search'></i>
+          <input type="text" placeholder="Search anything...">
         </div>
-      </section>
-    </section>
-  </div>
+        <div class="profile-group">
+          <div class="notif-btn">
+            <i class='bx bx-bell'></i>
+            <span class="notif-badge"></span>
+          </div>
+          <div class="profile-avatar">{{ user.username|default:"N"|make_list|first|upper }}</div>
+          <div class="profile-name">{{ user.username|default:"Nitin" }} <i class='bx bx-chevron-down'></i></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon icon-blue"><i class='bx bx-book-open'></i></div>
+        <div class="stat-info">
+          <h3>12</h3>
+          <p>Courses Enrolled</p>
+          <div class="stat-trend"><i class='bx bx-up-arrow-alt'></i> 2 this week</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon icon-green"><i class='bx bx-briefcase-alt-2'></i></div>
+        <div class="stat-info">
+          <h3>5</h3>
+          <p>Jobs Applied</p>
+          <div class="stat-trend"><i class='bx bx-up-arrow-alt'></i> 1 this week</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon icon-purple"><i class='bx bx-trophy'></i></div>
+        <div class="stat-info">
+          <h3>82%</h3>
+          <p>Quiz Score</p>
+          <div class="stat-trend"><i class='bx bx-up-arrow-alt'></i> 8% improvement</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon icon-orange"><i class='bx bx-star'></i></div>
+        <div class="stat-info">
+          <h3>18</h3>
+          <p>Skills Learned</p>
+          <div class="stat-trend"><i class='bx bx-up-arrow-alt'></i> 3 this week</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div>
+      <h2 class="section-heading">Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-left">
+            <div class="f-icon"><i class='bx bx-code-alt'></i></div>
+            <div class="feature-text">
+              <h4>Prep2Hire Connect</h4>
+              <p>Join over multiple students and learn together.</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <a href="/connect/" class="btn-get-started">Get Started</a>
+            <i class='bx bx-chevron-right'></i>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-left">
+            <div class="f-icon" style="color: #2563eb;"><i class='bx bxl-wordpress'></i></div>
+            <div class="feature-text">
+              <h4>Find Your Career</h4>
+              <p>Find over 1 million jobs and build your future.</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <a href="/carrer_recommendation/" class="btn-get-started">Get Started</a>
+            <i class='bx bx-chevron-right'></i>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-left">
+            <div class="f-icon" style="color: #9333ea;"><i class='bx bx-palette'></i></div>
+            <div class="feature-text">
+              <h4>Quizzes</h4>
+              <p>Join over 2 million students and test your skills.</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <a href="/skill-development/quizzes/" class="btn-get-started">Get Started</a>
+            <i class='bx bx-chevron-right'></i>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-left">
+            <div class="f-icon" style="background:#fff7ed; color:#ea580c;"><i class='bx bx-code-curly'></i></div>
+            <div class="feature-text">
+              <h4>Code Pro</h4>
+              <p>Practice coding and get hundreds of questions.</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <a href="/coding/" class="btn-get-started">Get Started</a>
+            <i class='bx bx-chevron-right'></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-grid">
+      <!-- To-Do Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <i class='bx bx-calendar-check'></i> My Courses / To-Do
+        </div>
+        
+        <div class="todo-input-bar">
+          <input type="text" placeholder="Add a new task...">
+          <button>Add</button>
+        </div>
+        
+        <ul class="todo-list">
+          <li class="todo-item">
+            <div class="todo-left">
+              <i class='bx bxs-check-circle'></i>
+              <span class="todo-text">Complete Python Basics Course</span>
+              <span class="todo-badge badge-course">Course</span>
+            </div>
+            <div class="todo-right">
+              <span style="display:flex; align-items:center; gap:6px;"><i class='bx bx-calendar'></i> May 12, 2026</span>
+              <i class='bx bx-dots-vertical-rounded' style="cursor:pointer;"></i>
+            </div>
+          </li>
+          <li class="todo-item">
+            <div class="todo-left">
+              <i class='bx bx-circle'></i>
+              <span class="todo-text">Solve 20 Aptitude Questions</span>
+              <span class="todo-badge badge-quiz">Quiz</span>
+            </div>
+            <div class="todo-right">
+              <span style="display:flex; align-items:center; gap:6px;"><i class='bx bx-calendar'></i> May 15, 2026</span>
+              <i class='bx bx-dots-vertical-rounded' style="cursor:pointer;"></i>
+            </div>
+          </li>
+          <li class="todo-item">
+            <div class="todo-left">
+              <i class='bx bx-circle'></i>
+              <span class="todo-text">Update Your Resume</span>
+              <span class="todo-badge badge-task">Task</span>
+            </div>
+            <div class="todo-right">
+              <span style="display:flex; align-items:center; gap:6px;"><i class='bx bx-calendar'></i> May 18, 2026</span>
+              <i class='bx bx-dots-vertical-rounded' style="cursor:pointer;"></i>
+            </div>
+          </li>
+          <li class="todo-item">
+            <div class="todo-left">
+              <i class='bx bx-circle'></i>
+              <span class="todo-text">Build a Django Project</span>
+              <span class="todo-badge badge-project">Project</span>
+            </div>
+            <div class="todo-right">
+              <span style="display:flex; align-items:center; gap:6px;"><i class='bx bx-calendar'></i> May 25, 2026</span>
+              <i class='bx bx-dots-vertical-rounded' style="cursor:pointer;"></i>
+            </div>
+          </li>
+        </ul>
+
+        <a href="#" class="view-all">View all tasks <i class='bx bx-right-arrow-alt'></i></a>
+      </div>
+
+      <!-- Activity Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <i class='bx bx-pulse'></i> Recent Activity
+        </div>
+
+        <ul class="activity-list">
+          <li class="activity-item">
+            <div class="activity-icon icon-green"><i class='bx bx-check'></i></div>
+            <div class="activity-content">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="activity-title">Quiz Completed</div>
+                <div class="activity-time">2h ago</div>
+              </div>
+              <div class="activity-desc">JavaScript Basics Quiz</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon icon-blue"><i class='bx bx-book-open'></i></div>
+            <div class="activity-content">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="activity-title">Course Progress</div>
+                <div class="activity-time">1d ago</div>
+              </div>
+              <div class="activity-desc">Python Basics - 60% Completed</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon icon-orange"><i class='bx bx-briefcase-alt-2'></i></div>
+            <div class="activity-content">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="activity-title">Job Applied</div>
+                <div class="activity-time">2d ago</div>
+              </div>
+              <div class="activity-desc">Backend Developer at TCS</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-icon icon-purple"><i class='bx bx-star'></i></div>
+            <div class="activity-content">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="activity-title">New Skill Added</div>
+                <div class="activity-time">3d ago</div>
+              </div>
+              <div class="activity-desc">Django</div>
+            </div>
+          </li>
+        </ul>
+
+        <a href="#" class="view-all">View all activity <i class='bx bx-right-arrow-alt'></i></a>
+      </div>
+    </div>
+  </main>
+
 </body>
-</html></span>
+</html>
