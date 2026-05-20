@@ -23,7 +23,7 @@
     - custom css link
   -->
   <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-<style>
+  <style>
 
     .dropdown {
       position: relative;
@@ -64,6 +64,178 @@
     .dropdown.show .dropdown-content {
       display: block;
     }
+
+    /* Search Modal Styles */
+    .search-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 120px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .search-modal.active {
+      display: flex;
+    }
+
+    .search-modal-content {
+      background: white;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-modal-header h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #192335;
+      margin: 0;
+    }
+
+    .search-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 5px;
+      transition: color 0.2s;
+    }
+
+    .search-close-btn:hover {
+      color: #192335;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      padding: 16px 20px 16px 50px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input-wrapper input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+    }
+
+    .search-input-wrapper ion-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 1.2rem;
+    }
+
+    .search-categories {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-category-btn {
+      padding: 8px 16px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #4b5563;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .search-category-btn:hover,
+    .search-category-btn.active {
+      background: #2563eb;
+      color: white;
+    }
+
+    .header-action-btn {
+      transition: all 0.2s ease;
+    }
+
+    .header-action-btn:hover {
+      transform: scale(1.1);
+      color: #2563eb !important;
+    }
+
+    /* Navbar link improvements */
+    .navbar-link {
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .navbar-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #2563eb;
+      transition: width 0.3s ease;
+    }
+
+    .navbar-link:hover::after {
+      width: 100%;
+    }
+
+    .navbar-link:hover {
+      color: #2563eb !important;
+    }
+
+    /* Responsive navbar improvements */
+    @media (max-width: 768px) {
+      .header {
+        padding: 15px 20px;
+      }
+      
+      .navbar-list {
+        gap: 8px;
+      }
+      
+      .navbar-link {
+        font-size: 0.95rem;
+        padding: 8px 12px;
+      }
+    }
   </style>
 
   <script>
@@ -78,6 +250,39 @@
         dropdowns[i].classList.remove('show');
       }
     }
+  }
+
+  // Search Modal Functions
+  function openSearchModal() {
+    document.getElementById('searchModal').classList.add('active');
+    document.getElementById('searchInput').focus();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSearchModal() {
+    document.getElementById('searchModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+
+  // Close modal on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeSearchModal();
+    }
+  });
+
+  // Close modal when clicking outside
+  document.getElementById('searchModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeSearchModal();
+    }
+  });
+
+  // Search category selection
+  function selectCategory(category) {
+    const buttons = document.querySelectorAll('.search-category-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
   }
 </script>
 
@@ -135,19 +340,27 @@
           </li>
 
           <li class="navbar-item">
-            <a href="#about" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">About</a>
+            <a href="/jobs/available-jobs/" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Jobs</a>
           </li>
 
           <li class="navbar-item">
-            <a href="#courses" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Courses</a>
+            <a href="/resume-analyzer/score-checker/" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Resume</a>
           </li>
 
           <li class="navbar-item">
-            <a href="#blog" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Blog</a>
+            <a href="/skill-development/courses/" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Courses</a>
           </li>
 
           <li class="navbar-item">
-            <a href="#" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Contact</a>
+            <a href="/skill-development/quizzes/" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Quiz</a>
+          </li>
+
+          <li class="navbar-item">
+            <a href="/coding/" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Code Practice</a>
+          </li>
+
+          <li class="navbar-item">
+            <a href="/connect/" class="navbar-link" data-nav-link style="color: #192335; font-weight: 600;">Community</a>
           </li>
 
         </ul>
@@ -156,13 +369,8 @@
 
       <div class="header-actions">
 
-        <button class="header-action-btn" aria-label="toggle search" title="Search">
+        <button class="header-action-btn" aria-label="toggle search" title="Search" onclick="openSearchModal()">
           <ion-icon name="search-outline" aria-hidden="true" style="color: #192335;"></ion-icon>
-        </button>
-
-        <button class="header-action-btn" aria-label="cart" title="Cart">
-          <ion-icon name="cart-outline" aria-hidden="true" style="color: #192335;"></ion-icon>
-          <span class="btn-badge">0</span>
         </button>
             {% if user.is_authenticated %}
                 <div class="dropdown" id="dropdownMenu">
@@ -210,18 +418,23 @@
 
           <div class="hero-content" style="flex: 1; min-width: 300px; max-width: 600px; padding-right: 40px; margin-bottom: 40px;">
 
-            <h1 class="h1 section-title" style="font-size: 5rem; font-weight: 800; color: #192335; line-height: 1.15; margin-bottom: 25px; font-family: 'League Spartan', sans-serif;">
-              Prep2Hire is the best choice for everyone!
+            <h1 class="h1 section-title" style="font-size: 4rem; font-weight: 800; color: #192335; line-height: 1.2; margin-bottom: 25px; font-family: 'League Spartan', sans-serif;">
+              Crack Interviews with AI-Powered Resume Analysis, Mock Interviews & Skill Preparation
             </h1>
 
-            <p class="hero-text" style="font-size: 1.15rem; color: #6b7280; margin-bottom: 40px; line-height: 1.7; max-width: 450px;">
-              It is a long established fact that reader will be distracted readable content of a page when.
+            <p class="hero-text" style="font-size: 1.15rem; color: #6b7280; margin-bottom: 40px; line-height: 1.7; max-width: 480px;">
+              Master your job search journey with intelligent resume scoring, personalized interview prep, and skill-building courses designed to land you your dream role.
             </p>
 
-            <a href="{% url 'dashboard' %}" class="btn" style="display: inline-flex; align-items: center; background: #e0f2fe; color: #0f172a; padding: 14px 28px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: all 0.3s ease; letter-spacing: 0.5px;">
-              EXPLORE COURSES 
-              <span style="margin-left: 8px;">➔</span>
-            </a>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+              <a href="{% url 'dashboard' %}" class="btn" style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; letter-spacing: 0.3px; box-shadow: 0 8px 24px rgba(37,99,235,0.3);">
+                Start Preparing 
+                <span style="margin-left: 8px;">➔</span>
+              </a>
+              <a href="/resume-analyzer/score-checker/" class="btn" style="display: inline-flex; align-items: center; background: white; color: #2563eb; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; letter-spacing: 0.3px; border: 2px solid #2563eb;">
+                Analyze Resume
+              </a>
+            </div>
 
           </div>
 
@@ -279,11 +492,11 @@
                 </div>
 
                 <h3 class="h3">
-                  <a href="http://localhost:3000/" class="card-title">Smart Resume Analyzer</a>
+                  <a href="/resume-analyzer/score-checker/" class="card-title">Smart Resume Analyzer</a>
                 </h3>
 
                 <p class="card-text">
-                  Instantly scan your resume for ATS compatibility, keyword usage.
+                  Instantly scan your resume for ATS compatibility, keyword usage, and improvement suggestions.
                 </p>
 
                 <span class="card-badge">Start Now</span>
@@ -300,14 +513,14 @@
                 </div>
 
                 <h3 class="h3">
-                  <a href="#" class="card-title">Roadmap to Dream Job</a>
+                  <a href="/jobs/roadmap/" class="card-title">Roadmap to Dream Job</a>
                 </h3>
 
                 <p class="card-text">
-                  Track your career journey with step-by-step plans tailored for your domain.
+                  Track your career journey with step-by-step plans tailored for your target role and domain.
                 </p>
 
-                <span class="card-badge">Let’s Go</span>
+                <span class="card-badge">Let's Go</span>
 
               </div>
             </li>
@@ -321,11 +534,11 @@
                 </div>
 
                 <h3 class="h3">
-                  <a href="#" class="card-title">Coding</a>
+                  <a href="/coding/" class="card-title">Coding Practice</a>
                 </h3>
 
                 <p class="card-text">
-                  AI-generated tips to improve your resume’s impact and chances of selection.
+                  Solve coding problems, track your progress, and prepare for technical interviews with real-world challenges.
                 </p>
 
                 <span class="card-badge">Code Now</span>
@@ -342,11 +555,11 @@
                 </div>
 
                 <h3 class="h3">
-                  <a href="#" class="card-title">Skill Development</a>
+                  <a href="/skill-development/courses/" class="card-title">Skill Development</a>
                 </h3>
 
                 <p class="card-text">
-                  Start your journey with Prep2Hire today — it's free and always student-focused.
+                  Access curated courses and quizzes to build in-demand skills and stay ahead in your career journey.
                 </p>
 
                 <span class="card-badge">Start Preparing</span>
@@ -466,7 +679,7 @@
                   <span class="badge">Beginner</span>
 
                   <h3 class="h3">
-                    <a href="#" class="card-title">Build Responsive Real- World Websites with HTML and CSS</a>
+                    <a href="/skills/courses/" class="card-title">Build Responsive Real- World Websites with HTML and CSS</a>
                   </h3>
 
                   <div class="wrapper">
@@ -525,7 +738,7 @@
                   <span class="badge">Advanced</span>
 
                   <h3 class="h3">
-                    <a href="#" class="card-title">Java Programming Masterclass for Software Developers</a>
+                    <a href="/skills/courses/" class="card-title">Java Programming Masterclass for Software Developers</a>
                   </h3>
 
                   <div class="wrapper">
@@ -584,7 +797,7 @@
                   <span class="badge">Intermediate</span>
 
                   <h3 class="h3">
-                    <a href="#" class="card-title">The Complete Camtasia Course for Content Creators</a>
+                    <a href="/skills/courses/" class="card-title">The Complete Camtasia Course for Content Creators</a>
                   </h3>
 
                   <div class="wrapper">
@@ -626,7 +839,7 @@
 
           </ul>
 
-          <a href="#" class="btn has-before">
+          <a href="/skill-development/courses/" class="btn has-before">
             <span class="span">Browse more courses</span>
 
             <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
@@ -639,35 +852,6 @@
 
 
 
-      <!-- 
-        - #VIDEO
-      -->
-
-      <section class="video has-bg-image" aria-label="video"
-        style="background-image: url('{% static 'assets/images/video-bg.png' %}')">
-        <div class="container">
-
-          <div class="video-card">
-
-            <div class="video-banner img-holder has-after" style="--width: ; --height: ;">
-              <img src="{% static 'assets/images/video-banner.jpg' %}" width="970" height="550" loading="lazy" alt="video banner"
-                class="img-cover">
-
-              <button class="play-btn" aria-label="play video">
-                <ion-icon name="play" aria-hidden="true"></ion-icon>
-              </button>
-            </div>
-
-            <img src="{% static 'assets/images/video-shape-1.png' %}" width="1089" height="605" loading="lazy" alt=""
-              class="shape video-shape-1">
-
-            <img src="{% static 'assets/images/video-shape-2.png' %}" width="158" height="174" loading="lazy" alt=""
-              class="shape video-shape-2">
-
-          </div>
-
-        </div>
-      </section>
 
 
 
@@ -742,19 +926,19 @@
 
                 <figure class="card-banner img-holder has-after" style="--width: 370; --height: 370;">
                   <img src="{% static 'assets/images/blog-1.jpg' %}" width="370" height="370" loading="lazy"
-                    alt="Become A Better Blogger: Content Planning" class="img-cover">
+                    alt="Python Developer Job" class="img-cover">
                 </figure>
 
                 <div class="card-content">
 
-                  <a href="#" class="card-btn" aria-label="read more">
+                  <a href="/jobs/available-jobs/" class="card-btn" aria-label="read more">
                     <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
                   </a>
 
-                  <a href="#" class="card-subtitle">Online</a>
+                  <a href="/jobs/available-jobs/" class="card-subtitle">Full-time</a>
 
                   <h3 class="h3">
-                    <a href="#" class="card-title">Python Developer</a>
+                    <a href="/jobs/available-jobs/" class="card-title">Python Developer</a>
                   </h3>
 
                   <ul class="card-meta-list">
@@ -762,19 +946,19 @@
                     <li class="card-meta-item">
                       <ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>
 
-                      <span class="span">Oct 10, 2021</span>
+                      <span class="span">Apply Now</span>
                     </li>
 
                     <li class="card-meta-item">
                       <ion-icon name="chatbubbles-outline" aria-hidden="true"></ion-icon>
 
-                      <span class="span">Com 09</span>
+                      <span class="span">Remote</span>
                     </li>
 
                   </ul>
 
                   <p class="card-text">
-                    Develop the applications using Django and problem solving
+                    Develop applications using Django and solve complex problems in a fast-paced environment.
                   </p>
 
                 </div>
@@ -787,19 +971,19 @@
 
                 <figure class="card-banner img-holder has-after" style="--width: 370; --height: 370;">
                   <img src="{% static 'assets/images/blog-2.jpg' %}" width="370" height="370" loading="lazy"
-                    alt="Become A Better Blogger: Content Planning" class="img-cover">
+                    alt="Software Engineer Job" class="img-cover">
                 </figure>
 
                 <div class="card-content">
 
-                  <a href="#" class="card-btn" aria-label="read more">
+                  <a href="/jobs/available-jobs/" class="card-btn" aria-label="read more">
                     <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
                   </a>
 
-                  <a href="#" class="card-subtitle">Online</a>
+                  <a href="/jobs/available-jobs/" class="card-subtitle">Full-time</a>
 
                   <h3 class="h3">
-                    <a href="#" class="card-title">Associate Software Engineer</a>
+                    <a href="/jobs/available-jobs/" class="card-title">Associate Software Engineer</a>
                   </h3>
 
                   <ul class="card-meta-list">
@@ -807,19 +991,19 @@
                     <li class="card-meta-item">
                       <ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>
 
-                      <span class="span">Oct 10, 2021</span>
+                      <span class="span">Apply Now</span>
                     </li>
 
                     <li class="card-meta-item">
                       <ion-icon name="chatbubbles-outline" aria-hidden="true"></ion-icon>
 
-                      <span class="span">Com 09</span>
+                      <span class="span">Hybrid</span>
                     </li>
 
                   </ul>
 
                   <p class="card-text">
-                    Having hands on experiance with Agile Technologies
+                    Join our team and work with cutting-edge Agile technologies to build scalable solutions.
                   </p>
 
                 </div>
@@ -832,19 +1016,19 @@
 
                 <figure class="card-banner img-holder has-after" style="--width: 370; --height: 370;">
                   <img src="{% static 'assets/images/blog-3.jpg' %}" width="370" height="370" loading="lazy"
-                    alt="Become A Better Blogger: Content Planning" class="img-cover">
+                    alt="Database Engineer Job" class="img-cover">
                 </figure>
 
                 <div class="card-content">
 
-                  <a href="#" class="card-btn" aria-label="read more">
+                  <a href="/jobs/available-jobs/" class="card-btn" aria-label="read more">
                     <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
                   </a>
 
-                  <a href="#" class="card-subtitle">Online</a>
+                  <a href="/jobs/available-jobs/" class="card-subtitle">Full-time</a>
 
                   <h3 class="h3">
-                    <a href="#" class="card-title">Database Engineer</a>
+                    <a href="/jobs/available-jobs/" class="card-title">Database Engineer</a>
                   </h3>
 
                   <ul class="card-meta-list">
@@ -852,19 +1036,19 @@
                     <li class="card-meta-item">
                       <ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>
 
-                      <span class="span">Oct 10, 2021</span>
+                      <span class="span">Apply Now</span>
                     </li>
 
                     <li class="card-meta-item">
                       <ion-icon name="chatbubbles-outline" aria-hidden="true"></ion-icon>
 
-                      <span class="span">Com 09</span>
+                      <span class="span">On-site</span>
                     </li>
 
                   </ul>
 
                   <p class="card-text">
-                    Powerful commands on database like SQL, MongoDB
+                    Design and optimize database systems using SQL, MongoDB, and other modern database technologies.
                   </p>
 
                 </div>
@@ -934,27 +1118,23 @@
           </li>
 
           <li>
-            <a href="#" class="footer-link">About</a>
+            <a href="#about" class="footer-link">About</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">Courses</a>
+            <a href="/skill-development/courses/" class="footer-link">Courses</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">Instructor</a>
+            <a href="/jobs/available-jobs/" class="footer-link">Jobs</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">Events</a>
+            <a href="/skill-development/quizzes/" class="footer-link">Quiz</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">Instructor Profile</a>
-          </li>
-
-          <li>
-            <a href="#" class="footer-link">Purchase Guide</a>
+            <a href="/connect/" class="footer-link">Community</a>
           </li>
 
         </ul>
@@ -966,27 +1146,27 @@
           </li>
 
           <li>
-            <a href="#" class="footer-link">Contact Us</a>
+            <a href="#about" class="footer-link">Contact Us</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">Gallery</a>
+            <a href="/resume-analyzer/score-checker/" class="footer-link">Resume Analyzer</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">News & Articles</a>
+            <a href="/coding/" class="footer-link">Coding Practice</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">FAQ's</a>
+            <a href="/jobs/roadmap/" class="footer-link">Career Roadmaps</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">Sign In/Registration</a>
+            <a href="{% url 'login' %}" class="footer-link">Sign In</a>
           </li>
 
           <li>
-            <a href="#" class="footer-link">Coming Soon</a>
+            <a href="{% url 'signup' %}" class="footer-link">Sign Up</a>
           </li>
 
         </ul>
@@ -1063,6 +1243,29 @@
 
 
 
+
+  <!-- Search Modal -->
+  <div id="searchModal" class="search-modal">
+    <div class="search-modal-content">
+      <div class="search-modal-header">
+        <h3>Search Prep2Hire</h3>
+        <button class="search-close-btn" onclick="closeSearchModal()" aria-label="Close search">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      <div class="search-input-wrapper">
+        <ion-icon name="search-outline"></ion-icon>
+        <input type="text" id="searchInput" placeholder="Search courses, jobs, resume tips, and more...">
+      </div>
+      <div class="search-categories">
+        <button class="search-category-btn active" onclick="selectCategory('all')">All</button>
+        <button class="search-category-btn" onclick="selectCategory('courses')">Courses</button>
+        <button class="search-category-btn" onclick="selectCategory('jobs')">Jobs</button>
+        <button class="search-category-btn" onclick="selectCategory('resume')">Resume</button>
+        <button class="search-category-btn" onclick="selectCategory('quiz')">Quiz</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 
     - #BACK TO TOP
