@@ -98,3 +98,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Required in Django 4.0+ when DEBUG=False — allows forms to POST on Render
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+]

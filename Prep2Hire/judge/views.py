@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Problem, Submission, TestCase
 from .forms import SubmissionForm
-from django.utils import timezone
 import json
 from .runner import run_python_code
 
@@ -24,7 +23,6 @@ def submit_solution(request, slug):
                 problem=prob,
                 code=code,
                 status='RUNNING',
-                created_at=timezone.now()
             )
 
             # Run against testcases synchronously (demo). Hide hidden TCs if desired.

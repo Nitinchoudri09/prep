@@ -22,10 +22,13 @@ class Command(BaseCommand):
             for job in results:
                 job_id = str(job['id'])
                 if not Job.objects.filter(job_id=job_id).exists():
+                    locations = job.get('locations', [])
+                    location = locations[0].get('name', '') if locations else ''
                     Job.objects.create(
                         job_id=job_id,
                         name=job['name'],
                         company=job['company']['name'],
+                        location=location,
                         description=job.get('contents', ''),
                         url=job['refs']['landing_page'],
                         date_posted=job['publication_date']

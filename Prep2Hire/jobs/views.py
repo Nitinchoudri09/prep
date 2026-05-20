@@ -9,7 +9,11 @@ from django.core.mail import send_mail
 
 def roadmap_view(request):
     roadmap_dir = os.path.join(settings.MEDIA_ROOT, 'roadmaps')
-    roadmap_files = os.listdir(roadmap_dir)
+    os.makedirs(roadmap_dir, exist_ok=True)  # ensure dir exists on fresh deploy
+    try:
+        roadmap_files = os.listdir(roadmap_dir)
+    except OSError:
+        roadmap_files = []
     context = {
         'roadmaps': [f'roadmaps/{file}' for file in roadmap_files if file.endswith('.pdf')]
     }
@@ -19,7 +23,6 @@ def available_jobs(request):
     return render(request, 'jobs/available_jobs.html')
 
 # views.py
-@login_required
 @login_required
 def update_desired_role(request):
     profile, created = Profile.objects.get_or_create(user=request.user)

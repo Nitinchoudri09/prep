@@ -1,8 +1,8 @@
 import subprocess
 import tempfile
 import os
+import sys
 import time
-import textwrap
 from pathlib import Path
 
 # Demo config - modify for testing
@@ -22,7 +22,7 @@ def run_python_code(code: str, input_data: str, timeout=RUN_TIMEOUT):
         start = time.time()
         try:
             proc = subprocess.run(
-                ["python3", str(code_file)],
+                [sys.executable, str(code_file)],  # use current Python interpreter
                 input=input_data.encode('utf-8'),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
