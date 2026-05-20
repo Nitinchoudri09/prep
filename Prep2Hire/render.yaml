@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: prep2hire
+    runtime: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn Prep2Hire.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: prep2hire-db
+          property: connectionString
+
+databases:
+  - name: prep2hire-db
+    databaseName: prep2hire
+    user: prep2hire
