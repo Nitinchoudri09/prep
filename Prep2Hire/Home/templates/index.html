@@ -200,6 +200,8 @@
     .navbar-link {
       position: relative;
       transition: color 0.2s ease;
+      font-size: 1.1rem !important;
+      font-family: 'Inter', 'Poppins', sans-serif;
     }
 
     .navbar-link::after {
@@ -316,9 +318,9 @@
   <header class="header" data-header style="background-color: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
     <div class="container">
 
-      <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px;">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-        <span style="font-size: 26px; color: #192335; font-family: 'League Spartan', sans-serif; font-weight: 800; letter-spacing: -0.5px;">Prep2Hire</span>
+      <a href="/" class="logo" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        <span style="font-size: 28px; color: #192335; font-family: 'League Spartan', sans-serif; font-weight: 800; letter-spacing: -0.5px;">Prep2Hire</span>
       </a>
 
       <nav class="navbar" data-navbar>
@@ -373,8 +375,8 @@
           <ion-icon name="search-outline" aria-hidden="true" style="color: #192335;"></ion-icon>
         </button>
             {% if user.is_authenticated %}
-                <div class="dropdown" id="dropdownMenu">
-                  <span class="dropdown-trigger btn" onclick="toggleDropdown()" style="background: transparent; color: #2563eb; border: 2px solid #2563eb; border-radius: 50px; padding: 10px 25px; font-weight: 600; font-size: 0.95rem; cursor: pointer;">Welcome, {{ user.username }}</span>
+                <div class="dropdown" id="dropdownMenu" style="margin-left: 10px;">
+                  <span class="dropdown-trigger btn" onclick="toggleDropdown()" style="background: transparent; color: #2563eb; border: 2px solid #2563eb; border-radius: 50px; padding: 12px 28px; font-weight: 700; font-size: 1.05rem; cursor: pointer; white-space: nowrap; display: inline-block;">Welcome, {{ user.username }}</span>
                     <div class="dropdown-content" style="top: 50px;">
                       <a href="{% url 'change_password' %}">Change Password</a>
                       <a href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to log out?');">Logout</a>
@@ -388,7 +390,7 @@
                     </div>
                   </div>
             {% else %}
-              <a href="{% url 'login' %}" class="btn" style="background: transparent; color: #2563eb; border: 2px solid #2563eb; border-radius: 50px; padding: 10px 25px; font-weight: 600; font-size: 0.95rem;">Login / Signup ➔</a>
+              <a href="{% url 'login' %}" class="btn" style="background: transparent; color: #2563eb; border: 2px solid #2563eb; border-radius: 50px; padding: 12px 28px; font-weight: 700; font-size: 1.05rem; margin-left: 10px; text-decoration: none; white-space: nowrap; display: inline-block;">Login / Signup ➔</a>
             {% endif %}
         <button class="header-action-btn" aria-label="open menu" data-nav-toggler>
           <ion-icon name="menu-outline" aria-hidden="true" style="color: #192335;"></ion-icon>
@@ -416,22 +418,22 @@
 
         <div class="container" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; z-index: 1; position: relative; width: 100%;">
 
-          <div class="hero-content" style="flex: 1; min-width: 300px; max-width: 600px; padding-right: 40px; margin-bottom: 40px;">
+          <div class="hero-content" style="flex: 1; min-width: 300px; max-width: 650px; padding-right: 40px; margin-bottom: 40px;">
 
-            <h1 class="h1 section-title" style="font-size: 4rem; font-weight: 800; color: #192335; line-height: 1.2; margin-bottom: 25px; font-family: 'League Spartan', sans-serif;">
+            <h1 class="h1 section-title" style="font-size: 4.5rem; font-weight: 800; color: #192335; line-height: 1.1; margin-bottom: 25px; font-family: 'League Spartan', sans-serif; letter-spacing: -1px;">
               Crack Interviews with AI-Powered Resume Analysis, Mock Interviews & Skill Preparation
             </h1>
 
-            <p class="hero-text" style="font-size: 1.15rem; color: #6b7280; margin-bottom: 40px; line-height: 1.7; max-width: 480px;">
+            <p class="hero-text" style="font-size: 1.25rem; color: #4b5563; margin-bottom: 40px; line-height: 1.7; max-width: 550px;">
               Master your job search journey with intelligent resume scoring, personalized interview prep, and skill-building courses designed to land you your dream role.
             </p>
 
-            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-              <a href="{% url 'dashboard' %}" class="btn" style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; letter-spacing: 0.3px; box-shadow: 0 8px 24px rgba(37,99,235,0.3);">
+            <div style="display: flex; gap: 18px; flex-wrap: wrap;">
+              <a href="{% url 'dashboard' %}" class="btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 18px 36px; border-radius: 50px; font-weight: 700; font-size: 1.15rem; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 8px 24px rgba(37,99,235,0.3);">
                 Start Preparing 
-                <span style="margin-left: 8px;">➔</span>
+                <span>➔</span>
               </a>
-              <a href="/resume-analyzer/score-checker/" class="btn" style="display: inline-flex; align-items: center; background: white; color: #2563eb; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: all 0.3s ease; letter-spacing: 0.3px; border: 2px solid #2563eb;">
+              <a href="/resume-analyzer/score-checker/" class="btn" style="display: inline-flex; align-items: center; justify-content: center; background: white; color: #2563eb; padding: 18px 36px; border-radius: 50px; font-weight: 700; font-size: 1.15rem; text-decoration: none; transition: all 0.3s ease; border: 2.5px solid #2563eb;">
                 Analyze Resume
               </a>
             </div>
