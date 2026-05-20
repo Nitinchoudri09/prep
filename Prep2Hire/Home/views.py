@@ -55,6 +55,9 @@ def career_quiz(request):
                     scores[career] = scores.get(career, 0) + val
 
         # Find top scoring career
+        if not scores:
+            return render(request, 'career_quiz.html', {'questions': questions, 'error': 'Please select at least one option.'})
+            
         suggested_career = max(scores, key=scores.get)
         suggestion = CareerSuggestion.objects.get(career=suggested_career)
         return render(request, 'carreer_result.html', {'suggestion': suggestion})

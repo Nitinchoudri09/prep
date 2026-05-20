@@ -133,12 +133,54 @@
     .view-all { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); text-decoration: none; font-weight: 700; font-size: 0.9rem; margin-top: 25px; transition: color 0.2s; }
     .view-all:hover { color: #1e40af; }
     .view-all i { font-size: 18px; }
+
+    /* Hamburger Menu Toggle */
+    .menu-toggle { display: none; font-size: 28px; color: var(--text-dark); cursor: pointer; }
+
+    /* Notification Dropdown Panel */
+    .notif-dropdown { position: absolute; top: 60px; right: 0; background: var(--card-bg); width: 340px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid var(--border-color); z-index: 200; display: none; flex-direction: column; opacity: 0; transform: translateY(-10px); transition: opacity 0.2s, transform 0.2s; }
+    .notif-dropdown.show { display: flex; opacity: 1; transform: translateY(0); }
+    .notif-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .notif-header h4 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+    .notif-header span { font-size: 0.8rem; color: var(--primary); cursor: pointer; font-weight: 600; }
+    .notif-body { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; }
+    .notif-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; transition: background 0.2s; cursor: pointer; }
+    .notif-item:hover { background: #f8fafc; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; flex-shrink: 0; }
+    .notif-item-icon.blue { background: #eff6ff; color: #3b82f6; }
+    .notif-item-icon.purple { background: #faf5ff; color: #a855f7; }
+    .notif-item-content { flex: 1; }
+    .notif-item-title { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 4px; }
+    .notif-item-time { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Responsive Media Queries */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    @media (max-width: 992px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+      .sidebar.active { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 20px; width: 100%; }
+      .menu-toggle { display: block; }
+      .header { flex-direction: column; gap: 20px; }
+      .header-right { width: 100%; justify-content: space-between; }
+      .search-bar { flex: 1; max-width: none; margin-right: 15px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .notif-dropdown { right: -50px; width: 300px; }
+    }
   </style>
 </head>
 <body>
 
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="logo-container">
       <i class='bx bxs-graduation'></i>
       <span>Prep2Hire</span>
@@ -177,9 +219,12 @@
     
     <!-- Header -->
     <header class="header">
-      <div class="header-text">
-        <h1>Welcome back, {{ user.username|default:"Nitin" }}! 👋</h1>
-        <p>Track your preparation journey and achieve your goals.</p>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <i class='bx bx-menu menu-toggle' id="menu-toggle"></i>
+        <div class="header-text">
+          <h1>Welcome back, {{ user.username|default:"Nitin" }}! 👋</h1>
+          <p>Track your preparation journey and achieve your goals.</p>
+        </div>
       </div>
       
       <div class="header-right">
@@ -188,9 +233,33 @@
           <input type="text" placeholder="Search anything...">
         </div>
         <div class="profile-group">
-          <div class="notif-btn">
+          <div class="notif-btn" id="notif-btn">
             <i class='bx bx-bell'></i>
-            <span class="notif-badge"></span>
+            <span class="notif-badge" id="notif-badge"></span>
+            
+            <!-- Notification Dropdown -->
+            <div class="notif-dropdown" id="notif-dropdown">
+              <div class="notif-header">
+                <h4>Notifications</h4>
+                <span id="mark-read">Mark all as read</span>
+              </div>
+              <div class="notif-body">
+                <div class="notif-item">
+                  <div class="notif-item-icon blue"><i class='bx bx-party'></i></div>
+                  <div class="notif-item-content">
+                    <div class="notif-item-title">Welcome to Prep2Hire!</div>
+                    <div class="notif-item-time">Just now</div>
+                  </div>
+                </div>
+                <div class="notif-item">
+                  <div class="notif-item-icon purple"><i class='bx bx-book-open'></i></div>
+                  <div class="notif-item-content">
+                    <div class="notif-item-title">New Python quizzes available</div>
+                    <div class="notif-item-time">2 hours ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="profile-avatar">{{ user.username|default:"N"|make_list|first|upper }}</div>
           <div class="profile-name">{{ user.username|default:"Nitin" }} <i class='bx bx-chevron-down'></i></div>
@@ -392,5 +461,45 @@
     {% endblock %}
   </main>
 
+  <!-- JavaScript for Interactivity -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Sidebar Toggle
+      const menuToggle = document.getElementById("menu-toggle");
+      const sidebar = document.getElementById("sidebar");
+      
+      menuToggle.addEventListener("click", function() {
+        sidebar.classList.toggle("active");
+      });
+
+      // Notification Dropdown Toggle
+      const notifBtn = document.getElementById("notif-btn");
+      const notifDropdown = document.getElementById("notif-dropdown");
+      const markReadBtn = document.getElementById("mark-read");
+      const notifBadge = document.getElementById("notif-badge");
+
+      notifBtn.addEventListener("click", function(e) {
+        if(e.target === markReadBtn) return;
+        notifDropdown.classList.toggle("show");
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", function(event) {
+        if (!notifBtn.contains(event.target)) {
+          notifDropdown.classList.remove("show");
+        }
+      });
+
+      // Mark as read functionality
+      markReadBtn.addEventListener("click", function(e) {
+        e.stopPropagation(); // prevent dropdown from toggling
+        notifBadge.style.display = "none";
+        
+        // Optional: clear notification items visually
+        // const notifBody = document.querySelector('.notif-body');
+        // notifBody.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">No new notifications</div>';
+      });
+    });
+  </script>
 </body>
 </html>
