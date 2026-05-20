@@ -55,8 +55,9 @@ WSGI_APPLICATION = 'Prep2Hire.wsgi.application'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'   # go to dashboard after login
+LOGOUT_REDIRECT_URL = '/'            # go to home after logout
+LOGIN_URL = '/login/'                # where @login_required redirects to
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

@@ -51,7 +51,7 @@ nav{
   font-size: 18px;
   text-transform: uppercase;
 }
-a{
+nav a{
   position: relative;
   color: rgb(85, 83, 83);
   font-size: 14px;
@@ -208,7 +208,7 @@ nav .fas{
     <nav>
       <ul>
         <li style="background-color: #1e40af;border-bottom: 1px solid #1e40af;transition: all 2s ease;border-radius: 5px;"><a href="#" class="logo">
-          <img src="{%static 'abc.png' %}" alt="ad">
+          <img src="{% static 'abc.png' %}" alt="ad">
           <h2 style = "color: #fff;font-weight: bold;font-style: italic;font-size: 1.5rem;margin-right:5px">Prep2Hire</h2>
         </a></li>
         <li><a href="/">
@@ -239,7 +239,7 @@ nav .fas{
           <i class="fas fa-question-circle" style = "color:#1e40af"></i>
           <span class="nav-item">Courses</span>
         </a></li>
-        <li><a href="/logout" class="logout" style="color:#1e40af">
+        <li><a href="{% url 'logout' %}" class="logout" style="color:#1e40af">
           <i class="fas fa-sign-out-alt" style = "color:#1e40af"></i>
           <span class="nav-item">Log out</span>
         </a></li>

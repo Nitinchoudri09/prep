@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login as auth_login
 from django.views.generic import TemplateView
 from django.contrib.auth import logout
 
@@ -11,8 +12,9 @@ def signup_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # Redirect to login after successful signup
+            user = form.save()
+            auth_login(request, user)          # auto-login after signup
+            return redirect('dashboard')        # go straight to dashboard
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})

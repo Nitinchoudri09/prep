@@ -1,131 +1,188 @@
-<!-- In your <head>, replace fonts and add styles -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Recommendation — Prep2Hire</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<!-- Google Fonts: Poppins -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      color: #1e293b;
+    }
 
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: #f4f7fb;
-    padding: 2rem;
-  }
-  .question-card {
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 1.8rem;
-    box-shadow: 0 6px 12px rgb(0 0 0 / 0.08);
-    color: #333;
-    transition: transform 0.2s ease;
-  }
-  /* Different pastel backgrounds cycling by index */
-  .question-card:nth-child(3n+1) { background: #ffd8d8; }
-  .question-card:nth-child(3n+2) { background: #d8e8ff; }
-  .question-card:nth-child(3n+3) { background: #d8ffe1; }
+    .page-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
 
-  .question-text {
-    font-weight: 600;
-    font-size: 1.2rem;
-    margin-bottom: 14px;
-  }
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
 
-  label {
-    cursor: pointer;
-    display: block;
-    padding: 12px 18px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    font-size: 1rem;
-    background: white;
-    border: 2px solid transparent;
-    user-select: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-  }
+    .page-header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
 
-  label:hover {
-    box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
-  }
+    .questions-container {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 1100px;
+      margin: 0 auto 2rem;
+    }
 
-  /* Hide default radio */
-  input[type="radio"] {
-    display: none;
-  }
+    .questions-column {
+      flex: 1;
+      min-width: 300px;
+    }
 
-  /* When checked, show colored border and subtle shadow */
-  input[type="radio"]:checked + label {
-    border-color: #007bff;
-    background-color: #cce5ff;
-    box-shadow: 0 0 8px #007bffaa;
-    font-weight: 700;
-  }
+    .question-card {
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s;
+    }
 
-  button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    font-weight: 700;
-    font-size: 1.25rem;
-    padding: 14px 36px;
-    border-radius: 12px;
-    border: none;
-    max-width: 320px;
-    width: 100%;
-    margin: 2rem auto 0;
-    display: block;
-    box-shadow: 0 8px 20px rgb(0 123 255 / 0.4);
-    transition: background-color 0.3s ease;
-  }
-  button[type="submit"]:hover {
-    background-color: #0056b3;
-  }
-  .questions-container {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
+    .question-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    }
 
-.questions-column {
-  flex: 1;
-  min-width: 320px; /* keeps it responsive */
-}
+    .question-card:nth-child(3n+1) { background: #fef3c7; }
+    .question-card:nth-child(3n+2) { background: #dbeafe; }
+    .question-card:nth-child(3n+3) { background: #d1fae5; }
 
-/* Optional: reduce margin between question cards when side-by-side */
-.questions-column .question-card {
-  margin-bottom: 1.4rem;
-}
+    .question-text {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 14px;
+      color: #1e293b;
+    }
 
-</style>
+    /* Hide default radio */
+    input[type="radio"] { display: none; }
 
+    label {
+      cursor: pointer;
+      display: block;
+      padding: 10px 16px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      background: rgba(255,255,255,0.75);
+      border: 2px solid transparent;
+      transition: all 0.25s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      font-family: inherit;
+    }
 
-<form method="post" class="container">
-  {% csrf_token %}
-  
-  <div class="questions-container">
-    <div class="questions-column">
-      {% for q in questions|slice:":9" %}
-      <div class="question-card">
-        <p class="question-text">{{ q.text }}</p>
-        {% for option in q.option_set.all %}
-          <input type="radio" id="q{{ q.id }}_opt{{ option.id }}" name="question_{{ q.id }}" value="{{ option.id }}">
-          <label for="q{{ q.id }}_opt{{ option.id }}">{{ option.text }}</label>
-        {% endfor %}
-      </div>
-      {% endfor %}
-    </div>
-    
-    <div class="questions-column">
-      {% for q in questions|slice:"9:" %}
-      <div class="question-card">
-        <p class="question-text">{{ q.text }}</p>
-        {% for option in q.option_set.all %}
-          <input type="radio" id="q{{ q.id }}_opt{{ option.id }}" name="question_{{ q.id }}" value="{{ option.id }}">
-          <label for="q{{ q.id }}_opt{{ option.id }}">{{ option.text }}</label>
-        {% endfor %}
-      </div>
-      {% endfor %}
-    </div>
+    label:hover {
+      background: rgba(255,255,255,1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    input[type="radio"]:checked + label {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+      font-weight: 600;
+      color: #1e40af;
+    }
+
+    .submit-wrap {
+      text-align: center;
+      padding-bottom: 2rem;
+    }
+
+    button[type="submit"] {
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: white;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 14px 44px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(37,99,235,0.4);
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    button[type="submit"]:hover  { opacity: 0.9; transform: translateY(-2px); }
+    button[type="submit"]:active { transform: translateY(0); }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.2rem;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>🎯 Find Your Career Path</h1>
+    <p>Answer the questions below to discover the career that suits you best</p>
   </div>
 
-  <button type="submit">Get My Career Path</button>
-</form>
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="questions-container">
+      <div class="questions-column">
+        {% for q in questions|slice:":9" %}
+        <div class="question-card">
+          <p class="question-text">{{ forloop.counter }}. {{ q.text }}</p>
+          {% for option in q.option_set.all %}
+            <input type="radio"
+                   id="q{{ q.id }}_opt{{ option.id }}"
+                   name="question_{{ q.id }}"
+                   value="{{ option.id }}">
+            <label for="q{{ q.id }}_opt{{ option.id }}">{{ option.text }}</label>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="questions-column">
+        {% for q in questions|slice:"9:" %}
+        <div class="question-card">
+          <p class="question-text">{{ forloop.counter|add:9 }}. {{ q.text }}</p>
+          {% for option in q.option_set.all %}
+            <input type="radio"
+                   id="q{{ q.id }}_opt{{ option.id }}"
+                   name="question_{{ q.id }}"
+                   value="{{ option.id }}">
+            <label for="q{{ q.id }}_opt{{ option.id }}">{{ option.text }}</label>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="submit">Get My Career Path →</button>
+      <a href="/dashboard/" class="back-link">← Back to Dashboard</a>
+    </div>
+  </form>
+
+</body>
+</html>
