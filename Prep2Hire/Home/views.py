@@ -1,8 +1,21 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from .forms import SignUpForm
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
+from django.http import HttpResponse
+import subprocess
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
-from django.views.generic import TemplateView
-from django.contrib.auth import logout
+
+def force_populate_db(request):
+    try:
+        out1 = subprocess.check_output(['python', 'populate_quizzes.py'], stderr=subprocess.STDOUT)
+        out2 = subprocess.check_output(['python', 'populate_problems.py'], stderr=subprocess.STDOUT)
+        return HttpResponse(f"<pre>Quizzes:\n{out1.decode('utf-8')}\nProblems:\n{out2.decode('utf-8')}</pre>")
+    except subprocess.CalledProcessError as e:
+        return HttpResponse(f"<pre>Error:\n{e.output.decode('utf-8')}</pre>")
 
 class HomeView(TemplateView):
     def get(self, request):

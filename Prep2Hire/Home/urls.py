@@ -5,6 +5,7 @@ from . views import *
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
+    path('force-populate/', views.force_populate_db, name='force_populate_db'),
     path('signup/', views.signup_view, name='signup'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', views.custom_logout, name='logout'),
