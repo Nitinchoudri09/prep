@@ -50,6 +50,92 @@ real_quizzes = [
                 "options": [("#header", True), (".header", False), ("header", False), ("*header", False)]
             }
         ]
+    },
+    {
+        "title": "Comprehensive Interview Prep",
+        "description": "A 20-question deep dive into full-stack development, algorithms, and general software engineering.",
+        "questions": [
+            {
+                "text": "What does HTTP stand for?",
+                "options": [("HyperText Transfer Protocol", True), ("HyperText Transmission Protocol", False), ("Hyper Transfer Text Protocol", False), ("Hyperlink Transfer Technology Protocol", False)]
+            },
+            {
+                "text": "Which CSS property controls the text size?",
+                "options": [("font-size", True), ("text-style", False), ("font-style", False), ("text-size", False)]
+            },
+            {
+                "text": "In Python, which of the following is NOT a built-in data type?",
+                "options": [("Array", True), ("Dictionary", False), ("Set", False), ("List", False)]
+            },
+            {
+                "text": "What is the primary purpose of the 'git clone' command?",
+                "options": [("To copy a repository to your local machine", True), ("To upload local changes to a remote repository", False), ("To create a new branch", False), ("To merge two branches together", False)]
+            },
+            {
+                "text": "Which SQL statement is used to extract data from a database?",
+                "options": [("SELECT", True), ("EXTRACT", False), ("GET", False), ("OPEN", False)]
+            },
+            {
+                "text": "What does the 'self' keyword represent in Python classes?",
+                "options": [("The instance of the class", True), ("The parent class", False), ("A private variable", False), ("A static method", False)]
+            },
+            {
+                "text": "Which of the following is a Javascript framework?",
+                "options": [("React", True), ("Django", False), ("Laravel", False), ("Flask", False)]
+            },
+            {
+                "text": "What does API stand for?",
+                "options": [("Application Programming Interface", True), ("Automated Program Integration", False), ("Applied Programming Interface", False), ("Application Process Integration", False)]
+            },
+            {
+                "text": "In Django, what is the role of 'models.py'?",
+                "options": [("To define database tables and relationships", True), ("To handle URL routing", False), ("To write HTML templates", False), ("To manage CSS and static files", False)]
+            },
+            {
+                "text": "What is the time complexity of a binary search?",
+                "options": [("O(log n)", True), ("O(n)", False), ("O(n^2)", False), ("O(1)", False)]
+            },
+            {
+                "text": "Which HTTP method is typically used to create a new resource?",
+                "options": [("POST", True), ("GET", False), ("PUT", False), ("DELETE", False)]
+            },
+            {
+                "text": "What does a 404 HTTP status code mean?",
+                "options": [("Not Found", True), ("Internal Server Error", False), ("Unauthorized", False), ("Bad Request", False)]
+            },
+            {
+                "text": "What is the purpose of 'Docker'?",
+                "options": [("To containerize applications for consistent environments", True), ("To write server-side code", False), ("To manage SQL databases", False), ("To compile C++ code", False)]
+            },
+            {
+                "text": "In JavaScript, what does '===' check?",
+                "options": [("Both value and type equality", True), ("Only value equality", False), ("Only type equality", False), ("If an object is empty", False)]
+            },
+            {
+                "text": "What does 'ORM' stand for in Django?",
+                "options": [("Object-Relational Mapping", True), ("Object-Routine Mapping", False), ("Operational Resource Management", False), ("Object-Relational Model", False)]
+            },
+            {
+                "text": "Which design pattern restricts a class to a single instance?",
+                "options": [("Singleton", True), ("Factory", False), ("Observer", False), ("Decorator", False)]
+            },
+            {
+                "text": "What is the difference between a list and a tuple in Python?",
+                "options": [("Lists are mutable, tuples are immutable", True), ("Tuples are mutable, lists are immutable", False), ("Lists can hold mixed types, tuples cannot", False), ("Tuples are faster for sorting", False)]
+            },
+            {
+                "text": "What command is used to save changes in Git?",
+                "options": [("git commit", True), ("git add", False), ("git save", False), ("git push", False)]
+            },
+            {
+                "text": "Which HTML tag is used to define an unordered list?",
+                "options": [("<ul>", True), ("<ol>", False), ("<li>", False), ("<list>", False)]
+            },
+            {
+                "text": "What is the main function of CSS?",
+                "options": [("To style and layout web pages", True), ("To add interactivity to elements", False), ("To define the structure of a document", False), ("To query the database", False)]
+            }
+        ]
     }
 ]
 
