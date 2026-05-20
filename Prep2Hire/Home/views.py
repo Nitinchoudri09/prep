@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login as auth_login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.http import HttpResponse
