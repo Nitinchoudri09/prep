@@ -1,0 +1,255 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .resume-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .db-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .db-header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-dark);
+  }
+
+  .btn-new-resume {
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+  }
+
+  .btn-new-resume:hover {
+    background: #1e40af;
+    transform: translateY(-2px);
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+  }
+
+  .resume-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+  }
+
+  .resume-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .resume-card:hover {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transform: translateY(-4px);
+    border-color: #cbd5e1;
+  }
+
+  .resume-thumb {
+    height: 160px;
+    background: #f1f5f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    color: #cbd5e1;
+    position: relative;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .resume-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .resume-score {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #10b981;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .resume-info {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .resume-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+
+  .resume-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+  }
+
+  .resume-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .btn-edit {
+    flex: 1;
+    background: #eff6ff;
+    color: var(--primary);
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .btn-edit:hover {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-delete {
+    background: #fef2f2;
+    color: #dc2626;
+    border: none;
+    width: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    transition: all 0.2s;
+  }
+
+  .btn-delete:hover {
+    background: #dc2626;
+    color: white;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 2px dashed var(--border-color);
+  }
+
+  .empty-state i {
+    font-size: 60px;
+    color: #cbd5e1;
+    margin-bottom: 15px;
+  }
+
+  .empty-state h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+
+  .empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 25px;
+  }
+</style>
+
+<div class="resume-dashboard">
+  
+  <div class="db-header">
+    <h2>AI Resume Builder</h2>
+    <a href="{% url 'resume_builder:new_builder' %}" class="btn-new-resume">
+      <i class='bx bx-plus'></i> Create New Resume
+    </a>
+  </div>
+
+  <h3 class="section-title">My Resumes</h3>
+
+  {% if resumes %}
+  <div class="resume-grid">
+    {% for resume in resumes %}
+    <div class="resume-card">
+      <div class="resume-thumb">
+        {% if resume.template and resume.template.thumbnail %}
+          <img src="{{ resume.template.thumbnail.url }}" alt="Template Thumbnail">
+        {% else %}
+          <i class='bx bx-file-blank'></i>
+        {% endif %}
+        <div class="resume-score">
+          <i class='bx bx-check-shield'></i> ATS: {{ resume.ats_score }}%
+        </div>
+      </div>
+      <div class="resume-info">
+        <div class="resume-title">{{ resume.title }}</div>
+        <div class="resume-meta">
+          Last updated: {{ resume.updated_at|date:"M d, Y" }}<br>
+          Template: {{ resume.template.name|default:"Blank Template" }}
+        </div>
+        <div class="resume-actions">
+          <a href="{% url 'resume_builder:builder' resume.id %}" class="btn-edit">Edit Resume</a>
+          <form action="{% url 'resume_builder:delete_resume' resume.id %}" method="post" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn-delete" onclick="return confirm('Delete this resume forever?');" title="Delete">
+              <i class='bx bx-trash'></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class='bx bx-file'></i>
+    <h3>No Resumes Yet</h3>
+    <p>Create your first AI-powered professional resume to get started.</p>
+    <a href="{% url 'resume_builder:new_builder' %}" class="btn-new-resume" style="display:inline-flex;">
+      <i class='bx bx-plus'></i> Create New Resume
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

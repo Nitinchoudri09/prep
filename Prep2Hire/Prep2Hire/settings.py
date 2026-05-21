@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'jobs',
     'skill_development',
     'resume_analyzer',
+    'resume_builder',
     'judge',
 ]
 
