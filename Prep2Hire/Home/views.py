@@ -62,7 +62,8 @@ def force_populate_db(request):
     try:
         out1 = subprocess.check_output(['python', 'populate_quizzes.py'], stderr=subprocess.STDOUT)
         out2 = subprocess.check_output(['python', 'populate_problems.py'], stderr=subprocess.STDOUT)
-        return HttpResponse(f"<pre>Quizzes:\n{out1.decode('utf-8')}\nProblems:\n{out2.decode('utf-8')}</pre>")
+        out3 = subprocess.check_output(['python', 'populate_career.py'], stderr=subprocess.STDOUT)
+        return HttpResponse(f"<pre>Quizzes:\n{out1.decode('utf-8')}\nProblems:\n{out2.decode('utf-8')}\nCareers:\n{out3.decode('utf-8')}</pre>")
     except subprocess.CalledProcessError as e:
         return HttpResponse(f"<pre>Error:\n{e.output.decode('utf-8')}</pre>")
 

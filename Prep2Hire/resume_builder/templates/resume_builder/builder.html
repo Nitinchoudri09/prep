@@ -271,7 +271,35 @@
                     </div>
                 </div>
                 
-                <!-- 5. Skills -->
+                <!-- 5. Projects -->
+                <div class="section-block">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span><i class='bx bx-code-alt' style="margin-right:8px; vertical-align:middle;"></i> Projects</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="section-body">
+                        <div id="projectsList"></div>
+                        <button class="btn-add-item" onclick="addProjectItem()">
+                            <i class='bx bx-plus'></i> Add Project
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 6. Certifications -->
+                <div class="section-block">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span><i class='bx bx-certification' style="margin-right:8px; vertical-align:middle;"></i> Certifications</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="section-body">
+                        <div id="certificationsList"></div>
+                        <button class="btn-add-item" onclick="addCertificationItem()">
+                            <i class='bx bx-plus'></i> Add Certification
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 7. Skills -->
                 <div class="section-block">
                     <div class="section-header" onclick="toggleSection(this)">
                         <span><i class='bx bx-wrench' style="margin-right:8px; vertical-align:middle;"></i> Skills</span>
@@ -288,11 +316,6 @@
                             <input type="text" data-field="skills.soft" oninput="updatePreview()" placeholder="Leadership, Communication...">
                         </div>
                     </div>
-                </div>
-
-                <!-- Placeholder for other 6 sections -->
-                <div style="padding: 15px; text-align:center; color: var(--text-muted); font-size:0.9rem;">
-                    <em>More sections (Projects, Certifications, Internships, etc.) loading dynamically...</em>
                 </div>
 
             </div>
@@ -356,7 +379,9 @@
                 summary: '',
                 skills: { technical: '', soft: '' },
                 experience: [],
-                education: []
+                education: [],
+                projects: [],
+                certifications: []
             };
         }
 
@@ -368,8 +393,11 @@
         document.querySelector('[data-field="personal.location"]').value = resumeData.personal?.location || '';
         document.querySelector('[data-field="summary"]').value = resumeData.summary || '';
         document.querySelector('[data-field="skills.technical"]').value = resumeData.skills?.technical || '';
+        document.querySelector('[data-field="skills.soft"]').value = resumeData.skills?.soft || '';
         
-        // Render dynamic lists (Experience)
+        // ── Render Dynamic Lists ──────────────────────────────
+
+        // Experience
         function renderExperienceForms() {
             const container = document.getElementById('experienceList');
             container.innerHTML = '';
@@ -410,12 +438,69 @@
             renderExperienceForms();
             updatePreview();
         }
-        function updateExp(index, field, value) {
-            resumeData.experience[index][field] = value;
-            updatePreview();
-        }
-        
+        function updateExp(index, field, value) { resumeData.experience[index][field] = value; updatePreview(); }
         renderExperienceForms();
+
+        // Education
+        function renderEducationForms() {
+            const container = document.getElementById('educationList');
+            container.innerHTML = '';
+            (resumeData.education || []).forEach((edu, index) => {
+                container.innerHTML += `
+                <div class="item-card">
+                    <button class="btn-remove-item" onclick="removeEducation(${index})"><i class='bx bx-x'></i></button>
+                    <div class="form-group"><label>Institution</label><input type="text" value="${edu.institution || ''}" oninput="updateEdu(${index}, 'institution', this.value)"></div>
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;"><label>Degree/Course</label><input type="text" value="${edu.degree || ''}" oninput="updateEdu(${index}, 'degree', this.value)"></div>
+                        <div class="form-group" style="flex:1;"><label>Year</label><input type="text" value="${edu.year || ''}" oninput="updateEdu(${index}, 'year', this.value)" placeholder="2018 - 2022"></div>
+                    </div>
+                </div>`;
+            });
+        }
+        function addEducationItem() { if(!resumeData.education) resumeData.education = []; resumeData.education.push({ institution: '', degree: '', year: '' }); renderEducationForms(); updatePreview(); }
+        function removeEducation(index) { resumeData.education.splice(index, 1); renderEducationForms(); updatePreview(); }
+        function updateEdu(index, field, value) { resumeData.education[index][field] = value; updatePreview(); }
+        renderEducationForms();
+
+        // Projects
+        function renderProjectForms() {
+            const container = document.getElementById('projectsList');
+            container.innerHTML = '';
+            (resumeData.projects || []).forEach((proj, index) => {
+                container.innerHTML += `
+                <div class="item-card">
+                    <button class="btn-remove-item" onclick="removeProject(${index})"><i class='bx bx-x'></i></button>
+                    <div class="form-group"><label>Project Name</label><input type="text" value="${proj.name || ''}" oninput="updateProj(${index}, 'name', this.value)"></div>
+                    <div class="form-group"><label>Tech Stack</label><input type="text" value="${proj.tech || ''}" oninput="updateProj(${index}, 'tech', this.value)" placeholder="React, Node.js..."></div>
+                    <div class="form-group"><label>Description</label><textarea oninput="updateProj(${index}, 'description', this.value)">${proj.description || ''}</textarea></div>
+                </div>`;
+            });
+        }
+        function addProjectItem() { if(!resumeData.projects) resumeData.projects = []; resumeData.projects.push({ name: '', tech: '', description: '' }); renderProjectForms(); updatePreview(); }
+        function removeProject(index) { resumeData.projects.splice(index, 1); renderProjectForms(); updatePreview(); }
+        function updateProj(index, field, value) { resumeData.projects[index][field] = value; updatePreview(); }
+        renderProjectForms();
+
+        // Certifications
+        function renderCertForms() {
+            const container = document.getElementById('certificationsList');
+            container.innerHTML = '';
+            (resumeData.certifications || []).forEach((cert, index) => {
+                container.innerHTML += `
+                <div class="item-card">
+                    <button class="btn-remove-item" onclick="removeCert(${index})"><i class='bx bx-x'></i></button>
+                    <div class="form-group"><label>Certification Name</label><input type="text" value="${cert.name || ''}" oninput="updateCert(${index}, 'name', this.value)"></div>
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;"><label>Issuer</label><input type="text" value="${cert.issuer || ''}" oninput="updateCert(${index}, 'issuer', this.value)"></div>
+                        <div class="form-group" style="flex:1;"><label>Year</label><input type="text" value="${cert.year || ''}" oninput="updateCert(${index}, 'year', this.value)"></div>
+                    </div>
+                </div>`;
+            });
+        }
+        function addCertificationItem() { if(!resumeData.certifications) resumeData.certifications = []; resumeData.certifications.push({ name: '', issuer: '', year: '' }); renderCertForms(); updatePreview(); }
+        function removeCert(index) { resumeData.certifications.splice(index, 1); renderCertForms(); updatePreview(); }
+        function updateCert(index, field, value) { resumeData.certifications[index][field] = value; updatePreview(); }
+        renderCertForms();
 
         // ── Preview Engine ──────────────────────────────────────
         function updatePreview() {
@@ -431,16 +516,63 @@
             // Generate Experience HTML
             let expHtml = '';
             (resumeData.experience || []).forEach(exp => {
-                expHtml += `
-                <div style="margin-bottom:15px;">
-                    <div style="display:flex; justify-content:space-between; font-size:10.5pt; margin-bottom:2px;">
-                        <strong style="color:inherit;">${exp.role || 'Role'}</strong>
-                        <span style="font-size:9.5pt; opacity:0.8;">${exp.duration || 'Duration'}</span>
-                    </div>
-                    <div style="font-size:10pt; font-weight:600; margin-bottom:6px;">${exp.company || 'Company'}</div>
-                    <p style="font-size:10pt; line-height:1.6; opacity:0.9;">${(exp.description || '').replace(/\n/g, '<br>')}</p>
-                </div>`;
+                if(exp.company || exp.role) {
+                    expHtml += `
+                    <div style="margin-bottom:15px;">
+                        <div style="display:flex; justify-content:space-between; font-size:10.5pt; margin-bottom:2px;">
+                            <strong style="color:inherit;">${exp.role || 'Role'}</strong>
+                            <span style="font-size:9.5pt; opacity:0.8;">${exp.duration || ''}</span>
+                        </div>
+                        <div style="font-size:10pt; font-weight:600; margin-bottom:6px;">${exp.company || 'Company'}</div>
+                        <p style="font-size:10pt; line-height:1.6; opacity:0.9;">${(exp.description || '').replace(/\n/g, '<br>')}</p>
+                    </div>`;
+                }
             });
+
+            // Generate Education HTML
+            let eduHtml = '';
+            (resumeData.education || []).forEach(edu => {
+                if(edu.institution || edu.degree) {
+                    eduHtml += `
+                    <div style="margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; font-size:10.5pt; margin-bottom:2px;">
+                            <strong style="color:inherit;">${edu.degree || 'Degree'}</strong>
+                            <span style="font-size:9.5pt; opacity:0.8;">${edu.year || ''}</span>
+                        </div>
+                        <div style="font-size:10pt; font-weight:600;">${edu.institution || 'Institution'}</div>
+                    </div>`;
+                }
+            });
+
+            // Generate Projects HTML
+            let projHtml = '';
+            (resumeData.projects || []).forEach(proj => {
+                if(proj.name) {
+                    projHtml += `
+                    <div style="margin-bottom:12px;">
+                        <div style="font-size:10.5pt; font-weight:bold; color:inherit;">${proj.name} ${proj.tech ? `<span style="font-size:9pt; font-weight:normal; opacity:0.8;">| ${proj.tech}</span>` : ''}</div>
+                        <p style="font-size:10pt; line-height:1.6; opacity:0.9; margin-top:4px;">${(proj.description || '').replace(/\n/g, '<br>')}</p>
+                    </div>`;
+                }
+            });
+
+            // Generate Certifications HTML
+            let certHtml = '';
+            (resumeData.certifications || []).forEach(cert => {
+                if(cert.name) {
+                    certHtml += `
+                    <div style="margin-bottom:8px; font-size:10pt;">
+                        <strong>${cert.name}</strong> - ${cert.issuer || ''} <span style="opacity:0.8;">(${cert.year || ''})</span>
+                    </div>`;
+                }
+            });
+
+            // Section visibility checks
+            const expSection = expHtml ? `<div class="section-heading">Experience</div><div style="margin-bottom:20px;">${expHtml}</div>` : '';
+            const eduSection = eduHtml ? `<div class="section-heading">Education</div><div style="margin-bottom:20px;">${eduHtml}</div>` : '';
+            const projSection = projHtml ? `<div class="section-heading">Projects</div><div style="margin-bottom:20px;">${projHtml}</div>` : '';
+            const certSection = certHtml ? `<div class="section-heading">Certifications</div><div style="margin-bottom:20px;">${certHtml}</div>` : '';
+            const skillSection = resumeData.skills.technical ? `<div class="section-heading">Skills</div><p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.skills.technical}</p>` : '';
 
             // Template Render Logic
             const tplId = resumeData.templateId || 'tpl-modern';
@@ -456,12 +588,11 @@
                     <div class="content-box">
                         <div class="section-heading">Professional Summary</div>
                         <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.summary}</p>
-                        
-                        <div class="section-heading">Experience</div>
-                        <div style="margin-bottom:20px;">${expHtml}</div>
-                        
-                        <div class="section-heading">Skills</div>
-                        <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.skills.technical}</p>
+                        ${expSection}
+                        ${eduSection}
+                        ${projSection}
+                        ${skillSection}
+                        ${certSection}
                     </div>
                 `;
             } else if (tplId === 'tpl-creative') {
@@ -474,14 +605,15 @@
                             <div>${resumeData.personal.phone}</div>
                             <div>${resumeData.personal.location}</div>
                         </div>
-                        <div class="section-heading" style="color:white;">Skills</div>
-                        <p style="font-size:10pt; line-height:1.6; color:#dbeafe;">${resumeData.skills.technical}</p>
+                        ${resumeData.skills.technical ? `<div class="section-heading" style="color:white; margin-top:30px;">Skills</div><p style="font-size:10pt; line-height:1.6; color:#dbeafe;">${resumeData.skills.technical}</p>` : ''}
+                        ${certHtml ? `<div class="section-heading" style="color:white; margin-top:30px;">Certificates</div><div style="color:#dbeafe;">${certHtml}</div>` : ''}
                     </div>
                     <div class="main-content">
                         <div class="section-heading">Profile</div>
                         <p style="font-size:10pt; line-height:1.6; margin-bottom:30px; color:#333;">${resumeData.summary}</p>
-                        <div class="section-heading">Experience</div>
-                        <div style="color:#333;">${expHtml}</div>
+                        <div style="color:#333;">${expSection}</div>
+                        <div style="color:#333;">${eduSection}</div>
+                        <div style="color:#333;">${projSection}</div>
                     </div>
                 `;
             } else {
@@ -498,11 +630,12 @@
                     <div class="section-heading">Professional Summary</div>
                     <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.summary}</p>
 
-                    <div class="section-heading">Experience</div>
-                    <div style="margin-bottom:20px;">${expHtml}</div>
+                    ${expSection}
+                    ${eduSection}
+                    ${projSection}
+                    ${skillSection}
+                    ${certSection}
                     
-                    <div class="section-heading">Skills</div>
-                    <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.skills.technical}</p>
                     ${tplId === 'tpl-software' ? '<div style="color:#d4d4d4; margin-top:20px;">} // end resume</div>' : ''}
                 `;
             }
@@ -599,18 +732,24 @@
         function generateQRCode() {
             const qrContainer = document.getElementById('qrCodeContainer');
             qrContainer.innerHTML = '';
-            // Mock sharing URL, in reality this would be a public endpoint /resumes/share/<uuid>
-            const url = window.location.origin + "/resumes/share/{{ resume.id }}";
+            
+            // To ensure QR code generates properly, use a fallback timeout or ensure DOM is ready
+            const url = window.location.origin + "/resumes/builder/{{ resume.id }}";
             document.getElementById('shareUrl').textContent = url;
             
-            new QRCode(qrContainer, {
-                text: url,
-                width: 180,
-                height: 180,
-                colorDark : "#0f172a",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
+            try {
+                new QRCode(qrContainer, {
+                    text: url,
+                    width: 180,
+                    height: 180,
+                    colorDark : "#0f172a",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } catch(err) {
+                console.error("QR Code Error:", err);
+                qrContainer.innerHTML = '<span style="color:red;">Error generating QR Code. Check CDN.</span>';
+            }
             document.getElementById('qrModal').classList.add('show');
         }
 
