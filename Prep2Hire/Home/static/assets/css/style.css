@@ -97,6 +97,51 @@
 
 }
 
+[data-theme="dark"] {
+  --eerie-black-1: hsl(0, 0%, 95%);
+  --eerie-black-2: hsl(0, 0%, 90%);
+  --quick-silver: hsl(0, 0%, 50%);
+  --light-gray: hsl(210, 15%, 25%);
+  --isabelline: hsl(210, 20%, 12%);
+  --gray-x-11: hsl(0, 0%, 30%);
+  --platinum: hsl(210, 15%, 20%);
+  --gray-web: hsl(0, 0%, 80%);
+  --white: hsl(210, 25%, 8%);
+  
+  /* Additional variables to fix inline hardcoded colors */
+  --header-bg: hsl(210, 25%, 10%);
+  --text-main: hsl(0, 0%, 95%);
+  --text-muted: hsl(210, 10%, 75%);
+  --card-bg: hsl(210, 25%, 12%);
+  --body-bg: hsl(210, 25%, 8%);
+}
+
+[data-theme="light"] {
+  --header-bg: #ffffff;
+  --text-main: #192335;
+  --text-muted: #4b5563;
+  --card-bg: #ffffff;
+  --body-bg: #fdf5f5;
+}
+
+/* Theme Toggle Button Styles */
+.theme-toggle-btn {
+  font-size: 24px;
+  color: var(--text-main);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+.theme-toggle-btn:hover {
+  background-color: var(--platinum);
+}
+
 
 
 

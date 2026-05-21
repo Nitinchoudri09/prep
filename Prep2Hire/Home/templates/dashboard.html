@@ -22,6 +22,17 @@
       --card-bg: rgba(20, 20, 30, 0.6);
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
+    
+    [data-theme="light"] {
+      --bg-color: #fdf5f5;
+      --primary-glow: rgba(59, 130, 246, 0.2);
+      --text-dark: #192335;
+      --text-muted: #4b5563;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    }
+    
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
         font-family: 'Inter', sans-serif; 
@@ -260,6 +271,10 @@
           <input type="text" placeholder="Search anything...">
         </div>
         <div class="profile-group">
+          <!-- Theme Toggle Button -->
+          <div class="notif-btn theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
+            <i class='bx bx-moon'></i>
+          </div>
           <div class="notif-btn" id="notif-btn">
             <i class='bx bx-bell'></i>
             <span class="notif-badge" id="notif-badge"></span>
@@ -490,6 +505,21 @@
 
   <!-- JavaScript for Interactivity -->
   <script>
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      const icon = document.querySelector('#themeToggleBtn i');
+      if (icon) {
+        icon.className = newTheme === 'light' ? 'bx bx-sun' : 'bx bx-moon';
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       // Sidebar Toggle
       const menuToggle = document.getElementById("menu-toggle");
