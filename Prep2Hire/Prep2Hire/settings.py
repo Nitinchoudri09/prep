@@ -65,6 +65,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+# Branded sender name shown in the recipient's inbox
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'HirePilot <noreply@hirepilot.com>')
+PASSWORD_RESET_TIMEOUT = 86400  # Reset link valid for 24 hours (in seconds)
 
 # Database
 DATABASE_URL = os.environ.get('DATABASE_URL')

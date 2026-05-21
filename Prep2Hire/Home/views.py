@@ -1,13 +1,62 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login as auth_login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordResetView
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.http import HttpResponse
+from django.contrib import messages
+from django.core.mail import BadHeaderError
+from smtplib import SMTPException
+import socket
 import subprocess
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login as auth_login
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Custom Forgot Password View — handles SMTP errors, invalid email, and
+# network issues gracefully instead of raising a 500 error.
+# ─────────────────────────────────────────────────────────────────────────────
+class CustomPasswordResetView(PasswordResetView):
+    """Extends Django's built-in PasswordResetView with robust error handling."""
+    template_name = 'password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_url = '/password-reset/done/'
+
+    def form_valid(self, form):
+        """Attempt to send the reset email; catch SMTP/network failures."""
+        email = form.cleaned_data.get('email', '').strip().lower()
+        try:
+            response = super().form_valid(form)
+            return response
+        except BadHeaderError:
+            messages.error(
+                self.request,
+                'Invalid email header detected. Please use a valid email address.'
+            )
+            return self.form_invalid(form)
+        except SMTPException as e:
+            messages.error(
+                self.request,
+                'We could not send the email due to a mail server issue. '
+                'Please try again later or contact support.'
+            )
+            return self.form_invalid(form)
+        except socket.gaierror:
+            messages.error(
+                self.request,
+                'Network error: Unable to reach the mail server. '
+                'Check your internet connection and try again.'
+            )
+            return self.form_invalid(form)
+        except Exception:
+            messages.error(
+                self.request,
+                'An unexpected error occurred. Please try again or contact support.'
+            )
+            return self.form_invalid(form)
 
 def force_populate_db(request):
     try:
