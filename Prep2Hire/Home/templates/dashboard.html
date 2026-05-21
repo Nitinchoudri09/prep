@@ -207,6 +207,20 @@
     ::-webkit-scrollbar-thumb { background: var(--hover-bg-strong); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--f-icon-border); }
 
+    /* Custom Modal */
+    .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+    .custom-modal.show { display: flex; opacity: 1; }
+    .custom-modal-content { background: var(--card-bg); border-radius: 16px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.4); transform: translateY(20px); transition: transform 0.3s ease; border: 1px solid var(--border-color); }
+    .custom-modal.show .custom-modal-content { transform: translateY(0); }
+    .custom-modal-icon { font-size: 48px; color: #ef4444; margin-bottom: 15px; }
+    .custom-modal h3 { font-size: 1.5rem; color: var(--text-dark); margin-bottom: 10px; font-weight: 700; }
+    .custom-modal p { color: var(--text-muted); margin-bottom: 25px; }
+    .custom-modal-actions { display: flex; gap: 15px; justify-content: center; }
+    .custom-modal .btn-cancel { padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-dark); font-weight: 600; cursor: pointer; transition: background 0.2s; flex: 1;}
+    .custom-modal .btn-cancel:hover { background: var(--hover-bg); }
+    .custom-modal .btn-confirm { padding: 10px 20px; border-radius: 8px; background: #ef4444; color: white; text-decoration: none; font-weight: 600; transition: background 0.2s; display: inline-flex; align-items: center; justify-content: center; flex: 1;}
+    .custom-modal .btn-confirm:hover { background: #dc2626; }
+
     /* Responsive Media Queries */
     @media (max-width: 1200px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -262,7 +276,7 @@
           <p>Visit our Help Center</p>
         </div>
       </div>
-      <a href="{% url 'logout' %}" class="logout-btn" onclick="return confirm('Are you sure you want to log out?');">
+      <a href="#" class="logout-btn" onclick="showLogoutModal(event)">
         <i class='bx bx-log-out'></i> Log out
       </a>
     </div>
@@ -519,8 +533,35 @@
     {% endblock %}
   </main>
 
+  <!-- Custom Logout Modal -->
+  <div id="logoutModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <div class="custom-modal-icon">
+        <i class='bx bx-log-out'></i>
+      </div>
+      <h3>Log Out</h3>
+      <p>Are you sure you want to log out of your account?</p>
+      <div class="custom-modal-actions">
+        <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+        <a href="{% url 'logout' %}" class="btn-confirm">Log Out</a>
+      </div>
+    </div>
+  </div>
+
   <!-- JavaScript for Interactivity -->
   <script>
+    function showLogoutModal(e) {
+      e.preventDefault();
+      const modal = document.getElementById('logoutModal');
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('show'), 10);
+    }
+    function closeLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 300);
+    }
+
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
