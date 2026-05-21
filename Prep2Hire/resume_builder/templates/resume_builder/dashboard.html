@@ -200,9 +200,14 @@
   
   <div class="db-header">
     <h2>AI Resume Builder</h2>
-    <a href="{% url 'resume_builder:new_builder' %}" class="btn-new-resume">
-      <i class='bx bx-plus'></i> Create New Resume
-    </a>
+    <div style="display: flex; gap: 12px;">
+      <a href="{% url 'resume_builder:subscription' %}" class="btn-new-resume" style="background:#fbbf24; color:#78350f;">
+        <i class='bx bx-crown'></i> Upgrade Plan
+      </a>
+      <a href="{% url 'resume_builder:new_builder' %}" class="btn-new-resume">
+        <i class='bx bx-plus'></i> Create New Resume
+      </a>
+    </div>
   </div>
 
   <h3 class="section-title">My Resumes</h3>

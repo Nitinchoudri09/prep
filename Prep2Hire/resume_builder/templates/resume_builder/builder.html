@@ -1,10 +1,708 @@
-{% extends 'dashboard.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder - HirePilot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- SortableJS for Drag and Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- HTML2PDF for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --primary: #2563eb;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+            --header-h: 70px;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Top Navigation */
+        .builder-nav { height: var(--header-h); background: var(--card-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .nav-left .back-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; color: var(--text-dark); text-decoration: none; transition: 0.2s; }
+        .nav-left .back-btn:hover { background: #e2e8f0; }
+        .nav-left h1 { font-size: 1.2rem; font-weight: 700; }
+        .nav-left input { font-size: 1.2rem; font-weight: 700; border: 1px solid transparent; padding: 4px 8px; border-radius: 6px; outline: none; }
+        .nav-left input:focus { border-color: var(--primary); background: #f8fafc; }
+        
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .btn-action { padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; border: none; transition: 0.2s; text-decoration: none;}
+        .btn-theme { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-dark); }
+        .btn-theme:hover { background: #f8fafc; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-save:hover { background: #1e40af; }
+        
+        /* Split Layout */
+        .builder-workspace { display: flex; height: calc(100vh - var(--header-h)); }
+        
+        /* Left Pane - Forms */
+        .left-pane { width: 500px; background: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+        
+        .pane-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        .pane-header h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+        .pane-header p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;}
+        
+        /* Progress Bar */
+        .progress-wrapper { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+        .progress-bar { height: 100%; background: #10b981; width: 0%; transition: width 0.3s ease; }
+        .strength-text { font-size: 0.8rem; font-weight: 700; color: #10b981; display: flex; justify-content: space-between;}
+        
+        .form-container { flex: 1; overflow-y: auto; padding: 20px; }
+        
+        /* Accordion / Sections */
+        .section-block { border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 15px; overflow: hidden; background: #fff; }
+        .section-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; cursor: pointer; font-weight: 600; color: var(--text-dark); }
+        .section-header i { color: var(--text-muted); font-size: 20px; transition: transform 0.3s; }
+        .section-header.active i { transform: rotate(180deg); }
+        .section-body { padding: 20px; display: none; border-top: 1px solid var(--border-color); }
+        .section-body.active { display: block; }
+        
+        /* Form Inputs */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 0.95rem; outline: none; transition: border 0.2s; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        
+        /* Dynamic Lists (Experience, Education) */
+        .item-card { border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; position: relative; background: #f8fafc; }
+        .btn-remove-item { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; cursor: pointer; font-size: 18px; }
+        .btn-add-item { width: 100%; padding: 12px; background: transparent; border: 2px dashed var(--border-color); border-radius: 8px; color: var(--primary); font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-add-item:hover { border-color: var(--primary); background: #eff6ff; }
+        
+        /* ── Template Styles ───────────────────────── */
+        .resume-canvas { width: 210mm; min-height: 297mm; background: white; box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; transform-origin: top center; margin: 0 auto; box-sizing: border-box;}
+        
+        /* TPL 1: Modern Corporate (Default) */
+        .tpl-modern { padding: 20mm; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        .tpl-modern .h-name { font-size: 26pt; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .tpl-modern .h-title { font-size: 14pt; color: #2563eb; font-weight: 600; margin-bottom: 15px; }
+        .tpl-modern .h-contact { font-size: 9.5pt; color: #64748b; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px; }
+        .tpl-modern .section-heading { font-size: 12pt; font-weight: 700; color: #1e293b; text-transform: uppercase; border-bottom: 2px solid #2563eb; padding-bottom: 4px; margin-bottom: 12px; display: inline-block; }
+        
+        /* TPL 2: Elegant Serif */
+        .tpl-elegant { padding: 25mm 20mm; font-family: 'Georgia', serif; background: #faf9f6; }
+        .tpl-elegant .h-name { font-size: 30pt; font-weight: 400; color: #2c3e50; text-align: center; margin-bottom: 8px; font-style: italic; }
+        .tpl-elegant .h-title { font-size: 12pt; color: #7f8c8d; text-align: center; margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase; }
+        .tpl-elegant .h-contact { font-size: 9pt; color: #34495e; text-align: center; margin-bottom: 30px; border-top: 1px solid #bdc3c7; border-bottom: 1px solid #bdc3c7; padding: 10px 0; }
+        .tpl-elegant .section-heading { font-size: 14pt; font-weight: 400; color: #2c3e50; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; text-align: center; }
+        
+        /* TPL 3: ATS Friendly (Minimal) */
+        .tpl-ats { padding: 15mm; font-family: 'Arial', sans-serif; }
+        .tpl-ats .h-name { font-size: 20pt; font-weight: bold; color: #000; margin-bottom: 5px; text-align: center; }
+        .tpl-ats .h-title { display: none; }
+        .tpl-ats .h-contact { font-size: 10pt; color: #000; text-align: center; margin-bottom: 15px; }
+        .tpl-ats .section-heading { font-size: 11pt; font-weight: bold; color: #000; text-transform: uppercase; border-bottom: 1px solid #000; margin-bottom: 10px; margin-top: 15px; }
 
-{% block content %}
-<div style="padding: 40px; text-align: center;">
-    <h2>Builder Interface</h2>
-    <p>This is where the split-screen drag-and-drop resume builder will go in Phase 2!</p>
-    <a href="{% url 'resume_builder:dashboard' %}" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #2563eb; color: white; border-radius: 8px; text-decoration: none;">Back to Dashboard</a>
-</div>
-{% endblock %}
+        /* TPL 4: Startup (Bold & Dark) */
+        .tpl-startup { padding: 0; font-family: 'Inter', sans-serif; }
+        .tpl-startup .header-box { background: #0f172a; color: white; padding: 25mm 20mm; margin-bottom: 15mm; }
+        .tpl-startup .h-name { font-size: 32pt; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px; color: white; }
+        .tpl-startup .h-title { font-size: 16pt; color: #38bdf8; font-weight: 600; margin-bottom: 15px; }
+        .tpl-startup .h-contact { font-size: 10pt; color: #94a3b8; }
+        .tpl-startup .section-heading { font-size: 14pt; font-weight: 800; color: #0f172a; text-transform: uppercase; margin: 0 20mm 15px 20mm; border-left: 5px solid #38bdf8; padding-left: 10px; }
+        .tpl-startup .content-box { padding: 0 20mm; }
+
+        /* TPL 5: Creative (Split Sidebar) */
+        .tpl-creative { padding: 0; font-family: 'Poppins', sans-serif; display: flex; min-height: 297mm; }
+        .tpl-creative .sidebar { width: 35%; background: #2563eb; color: white; padding: 20mm 10mm; }
+        .tpl-creative .main-content { width: 65%; padding: 20mm 15mm; background: white; }
+        .tpl-creative .h-name { font-size: 28pt; font-weight: 800; line-height: 1.1; margin-bottom: 10px; color: white; }
+        .tpl-creative .h-title { font-size: 14pt; color: #93c5fd; font-weight: 500; margin-bottom: 30px; }
+        .tpl-creative .h-contact { font-size: 9.5pt; color: #dbeafe; line-height: 2; margin-bottom: 40px; }
+        .tpl-creative .section-heading { font-size: 14pt; font-weight: 700; color: #1e3a8a; text-transform: uppercase; margin-bottom: 15px; position: relative; }
+        .tpl-creative .section-heading::after { content: ''; position: absolute; left: 0; bottom: -5px; width: 30px; height: 3px; background: #2563eb; }
+        
+        /* TPL 6: Software Engineer (Terminal) */
+        .tpl-software { padding: 20mm; font-family: 'Fira Code', monospace; background: #1e1e1e; color: #d4d4d4; }
+        .tpl-software .h-name { font-size: 24pt; color: #569cd6; font-weight: bold; margin-bottom: 5px; }
+        .tpl-software .h-name::before { content: '~/'; color: #4ec9b0; }
+        .tpl-software .h-title { font-size: 12pt; color: #ce9178; margin-bottom: 15px; }
+        .tpl-software .h-contact { font-size: 9pt; color: #608b4e; border-bottom: 1px dashed #404040; padding-bottom: 15px; margin-bottom: 20px; }
+        .tpl-software .section-heading { font-size: 14pt; color: #c586c0; margin-bottom: 15px; margin-top: 20px; }
+        .tpl-software .section-heading::before { content: 'function '; color: #569cd6; }
+        .tpl-software .section-heading::after { content: '() {'; color: #d4d4d4; }
+
+        /* Template Switcher Modal */
+        .tpl-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .tpl-modal.show { display: flex; }
+        .tpl-modal-content { background: white; padding: 30px; border-radius: 12px; width: 600px; max-width: 90%; }
+        .tpl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .tpl-opt { border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .tpl-opt:hover { border-color: var(--primary); background: #eff6ff; }
+        .tpl-opt.active { border-color: var(--primary); background: #eff6ff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="builder-nav">
+        <div class="nav-left">
+            <a href="{% url 'resume_builder:dashboard' %}" class="back-btn"><i class='bx bx-arrow-back'></i></a>
+            <input type="text" id="resumeTitle" value="{{ resume.title }}" onblur="triggerAutoSave()">
+        </div>
+        <div class="nav-right">
+            <div style="background: #f0fdf4; color: #16a34a; padding: 8px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; margin-right: 15px;">
+                <i class='bx bx-check-shield'></i> ATS: <span id="atsScoreDisplay">{{ resume.ats_score }}</span>%
+            </div>
+            <button class="btn-action btn-theme" onclick="document.getElementById('tplModal').classList.add('show')"><i class='bx bx-palette'></i> Change Template</button>
+            <button class="btn-action btn-save" onclick="saveResume(true)"><i class='bx bx-save'></i> Save Resume</button>
+            <button class="btn-action" style="background:#8b5cf6; color:white;" onclick="generateQRCode()"><i class='bx bx-qr'></i> Share</button>
+            <button class="btn-action" style="background:#0f172a; color:white;" onclick="exportPDF()"><i class='bx bxs-file-pdf'></i> Export PDF</button>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <div class="builder-workspace">
+        
+        <!-- Left Pane (Form Editor) -->
+        <div class="left-pane">
+            <div class="pane-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Resume Sections</h2>
+                    <span style="font-size:0.8rem; background:#eff6ff; color:#2563eb; padding:4px 8px; border-radius:12px; font-weight:700;"><i class='bx bx-info-circle'></i> Auto-saving</span>
+                </div>
+                <p>Drag sections to reorder. Fill details to update preview.</p>
+                
+                <div class="progress-wrapper">
+                    <div class="progress-bar" id="resumeProgressBar"></div>
+                </div>
+                <div class="strength-text">
+                    <span>Profile Strength</span>
+                    <span id="strengthText">0%</span>
+                </div>
+            </div>
+            
+            <div class="form-container" id="sectionsContainer">
+                
+                <!-- 1. Personal Info -->
+                <div class="section-block">
+                    <div class="section-header active" onclick="toggleSection(this)">
+                        <span><i class='bx bx-user' style="margin-right:8px; vertical-align:middle;"></i> Personal Information</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="section-body active">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" data-field="personal.fullName" value="" oninput="updatePreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Job Title</label>
+                            <input type="text" data-field="personal.jobTitle" value="" oninput="updatePreview()" placeholder="e.g. Senior Software Engineer">
+                        </div>
+                        <div style="display:flex; gap:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Email</label>
+                                <input type="email" data-field="personal.email" value="" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Phone</label>
+                                <input type="text" data-field="personal.phone" value="" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Location (City, Country)</label>
+                            <input type="text" data-field="personal.location" value="" oninput="updatePreview()">
+                        </div>
+                        <div style="display:flex; gap:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>LinkedIn URL</label>
+                                <input type="text" data-field="personal.linkedin" value="" oninput="updatePreview()">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>GitHub URL</label>
+                                <input type="text" data-field="personal.github" value="" oninput="updatePreview()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2. Career Objective -->
+                <div class="section-block">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span><i class='bx bx-target-lock' style="margin-right:8px; vertical-align:middle;"></i> Professional Summary</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="section-body">
+                        <button class="btn-ai" onclick="generateAISummary()"><i class='bx bx-magic-wand'></i> Write with AI</button>
+                        <div class="form-group">
+                            <textarea id="summaryInput" data-field="summary" oninput="updatePreview()" placeholder="Brief summary of your professional background and goals..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Experience -->
+                <div class="section-block">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span><i class='bx bx-briefcase' style="margin-right:8px; vertical-align:middle;"></i> Work Experience</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="section-body">
+                        <div id="experienceList">
+                            <!-- JS will inject experience items here -->
+                        </div>
+                        <button class="btn-add-item" onclick="addExperienceItem()">
+                            <i class='bx bx-plus'></i> Add Experience
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 4. Education -->
+                <div class="section-block">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span><i class='bx bxs-graduation' style="margin-right:8px; vertical-align:middle;"></i> Education</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="section-body">
+                        <div id="educationList"></div>
+                        <button class="btn-add-item" onclick="addEducationItem()">
+                            <i class='bx bx-plus'></i> Add Education
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 5. Skills -->
+                <div class="section-block">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <span><i class='bx bx-wrench' style="margin-right:8px; vertical-align:middle;"></i> Skills</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="section-body">
+                        <button class="btn-ai" onclick="generateAIKeywords()"><i class='bx bx-search-alt-2'></i> Suggest ATS Keywords</button>
+                        <div class="form-group">
+                            <label>Technical Skills (Comma separated)</label>
+                            <textarea id="skillsInput" data-field="skills.technical" oninput="updatePreview()" placeholder="Python, Django, React, SQL..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Soft Skills</label>
+                            <input type="text" data-field="skills.soft" oninput="updatePreview()" placeholder="Leadership, Communication...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Placeholder for other 6 sections -->
+                <div style="padding: 15px; text-align:center; color: var(--text-muted); font-size:0.9rem;">
+                    <em>More sections (Projects, Certifications, Internships, etc.) loading dynamically...</em>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Right Pane (Live Preview) -->
+        <div class="right-pane">
+            <div class="toolbar-preview">
+                <button class="toolbar-btn" title="Zoom In" onclick="zoomIn()"><i class='bx bx-zoom-in'></i></button>
+                <button class="toolbar-btn" title="Zoom Out" onclick="zoomOut()"><i class='bx bx-zoom-out'></i></button>
+            </div>
+            
+            <div class="resume-canvas tpl-modern" id="resumePreview">
+                <!-- Inner structure dynamically handled by JS based on template -->
+                <div id="dynamicTemplateContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="saveToast">Resume auto-saved successfully!</div>
+
+    <!-- Template Switcher Modal -->
+    <div class="tpl-modal" id="tplModal">
+        <div class="tpl-modal-content" style="width: 800px;">
+            <h2 style="margin-bottom:5px;">Select a Template</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Choose from our expertly crafted designs.</p>
+            <div class="tpl-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="tpl-opt active" onclick="switchTemplate('tpl-modern', this)">Modern Corporate</div>
+                <div class="tpl-opt" onclick="switchTemplate('tpl-elegant', this)">Elegant Serif</div>
+                <div class="tpl-opt" onclick="switchTemplate('tpl-ats', this)">ATS Friendly</div>
+                <div class="tpl-opt" onclick="switchTemplate('tpl-startup', this)">Startup Tech</div>
+                <div class="tpl-opt" onclick="switchTemplate('tpl-creative', this)">Creative Split</div>
+                <div class="tpl-opt" onclick="switchTemplate('tpl-software', this)">Software Dev</div>
+            </div>
+            <div style="text-align:right; margin-top:20px;">
+                <button class="btn-action" style="background:#e2e8f0; color:#0f172a; display:inline-block;" onclick="document.getElementById('tplModal').classList.remove('show')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="tpl-modal" id="qrModal">
+        <div class="tpl-modal-content" style="width:400px; text-align:center;">
+            <h2 style="margin-bottom:5px;">Share Resume</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Scan to view your live resume.</p>
+            <div id="qrCodeContainer" style="display:flex; justify-content:center; margin-bottom:20px;"></div>
+            <p style="font-size:0.8rem; background:#f1f5f9; padding:8px; border-radius:6px; word-break:break-all;" id="shareUrl"></p>
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn-action" style="background:#e2e8f0; color:#0f172a; display:inline-block;" onclick="document.getElementById('qrModal').classList.remove('show')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let resumeData = {{ resume.content|safe }};
+        if(Object.keys(resumeData).length === 0) {
+            // Initialize empty schema if blank
+            resumeData = {
+                personal: { fullName: '', jobTitle: '', email: '', phone: '', location: '', linkedin: '', github: '' },
+                summary: '',
+                skills: { technical: '', soft: '' },
+                experience: [],
+                education: []
+            };
+        }
+
+        // Initialize UI with existing data
+        document.querySelector('[data-field="personal.fullName"]').value = resumeData.personal?.fullName || '';
+        document.querySelector('[data-field="personal.jobTitle"]').value = resumeData.personal?.jobTitle || '';
+        document.querySelector('[data-field="personal.email"]').value = resumeData.personal?.email || '';
+        document.querySelector('[data-field="personal.phone"]').value = resumeData.personal?.phone || '';
+        document.querySelector('[data-field="personal.location"]').value = resumeData.personal?.location || '';
+        document.querySelector('[data-field="summary"]').value = resumeData.summary || '';
+        document.querySelector('[data-field="skills.technical"]').value = resumeData.skills?.technical || '';
+        
+        // Render dynamic lists (Experience)
+        function renderExperienceForms() {
+            const container = document.getElementById('experienceList');
+            container.innerHTML = '';
+            (resumeData.experience || []).forEach((exp, index) => {
+                container.innerHTML += `
+                <div class="item-card">
+                    <button class="btn-remove-item" onclick="removeExperience(${index})"><i class='bx bx-x'></i></button>
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" value="${exp.company || ''}" oninput="updateExp(${index}, 'company', this.value)">
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Role/Title</label>
+                            <input type="text" value="${exp.role || ''}" oninput="updateExp(${index}, 'role', this.value)">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Duration</label>
+                            <input type="text" value="${exp.duration || ''}" oninput="updateExp(${index}, 'duration', this.value)" placeholder="Jan 2020 - Present">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description & Achievements</label>
+                        <textarea oninput="updateExp(${index}, 'description', this.value)">${exp.description || ''}</textarea>
+                    </div>
+                </div>`;
+            });
+        }
+        
+        function addExperienceItem() {
+            if(!resumeData.experience) resumeData.experience = [];
+            resumeData.experience.push({ company: '', role: '', duration: '', description: '' });
+            renderExperienceForms();
+            updatePreview();
+        }
+        function removeExperience(index) {
+            resumeData.experience.splice(index, 1);
+            renderExperienceForms();
+            updatePreview();
+        }
+        function updateExp(index, field, value) {
+            resumeData.experience[index][field] = value;
+            updatePreview();
+        }
+        
+        renderExperienceForms();
+
+        // ── Preview Engine ──────────────────────────────────────
+        function updatePreview() {
+            // Read basic inputs
+            resumeData.personal.fullName = document.querySelector('[data-field="personal.fullName"]').value || 'Your Name';
+            resumeData.personal.jobTitle = document.querySelector('[data-field="personal.jobTitle"]').value || 'Job Title';
+            resumeData.personal.email = document.querySelector('[data-field="personal.email"]').value || 'email@example.com';
+            resumeData.personal.phone = document.querySelector('[data-field="personal.phone"]').value || '+1 234 567 890';
+            resumeData.personal.location = document.querySelector('[data-field="personal.location"]').value || 'City, Country';
+            resumeData.summary = document.querySelector('[data-field="summary"]').value || 'Your professional summary will appear here.';
+            resumeData.skills.technical = document.querySelector('[data-field="skills.technical"]').value || '';
+            
+            // Generate Experience HTML
+            let expHtml = '';
+            (resumeData.experience || []).forEach(exp => {
+                expHtml += `
+                <div style="margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; font-size:10.5pt; margin-bottom:2px;">
+                        <strong style="color:inherit;">${exp.role || 'Role'}</strong>
+                        <span style="font-size:9.5pt; opacity:0.8;">${exp.duration || 'Duration'}</span>
+                    </div>
+                    <div style="font-size:10pt; font-weight:600; margin-bottom:6px;">${exp.company || 'Company'}</div>
+                    <p style="font-size:10pt; line-height:1.6; opacity:0.9;">${(exp.description || '').replace(/\n/g, '<br>')}</p>
+                </div>`;
+            });
+
+            // Template Render Logic
+            const tplId = resumeData.templateId || 'tpl-modern';
+            const container = document.getElementById('dynamicTemplateContent');
+            
+            if (tplId === 'tpl-startup') {
+                container.innerHTML = `
+                    <div class="header-box">
+                        <div class="h-name">${resumeData.personal.fullName}</div>
+                        <div class="h-title">${resumeData.personal.jobTitle}</div>
+                        <div class="h-contact">${resumeData.personal.email} • ${resumeData.personal.phone} • ${resumeData.personal.location}</div>
+                    </div>
+                    <div class="content-box">
+                        <div class="section-heading">Professional Summary</div>
+                        <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.summary}</p>
+                        
+                        <div class="section-heading">Experience</div>
+                        <div style="margin-bottom:20px;">${expHtml}</div>
+                        
+                        <div class="section-heading">Skills</div>
+                        <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.skills.technical}</p>
+                    </div>
+                `;
+            } else if (tplId === 'tpl-creative') {
+                container.innerHTML = `
+                    <div class="sidebar">
+                        <div class="h-name">${resumeData.personal.fullName}</div>
+                        <div class="h-title">${resumeData.personal.jobTitle}</div>
+                        <div class="h-contact">
+                            <div>${resumeData.personal.email}</div>
+                            <div>${resumeData.personal.phone}</div>
+                            <div>${resumeData.personal.location}</div>
+                        </div>
+                        <div class="section-heading" style="color:white;">Skills</div>
+                        <p style="font-size:10pt; line-height:1.6; color:#dbeafe;">${resumeData.skills.technical}</p>
+                    </div>
+                    <div class="main-content">
+                        <div class="section-heading">Profile</div>
+                        <p style="font-size:10pt; line-height:1.6; margin-bottom:30px; color:#333;">${resumeData.summary}</p>
+                        <div class="section-heading">Experience</div>
+                        <div style="color:#333;">${expHtml}</div>
+                    </div>
+                `;
+            } else {
+                // Default structure for Modern, Elegant, ATS, Software
+                container.innerHTML = `
+                    <div style="margin-bottom:20px;">
+                        <div class="h-name">${resumeData.personal.fullName}</div>
+                        <div class="h-title">${resumeData.personal.jobTitle}</div>
+                        <div class="h-contact">
+                            ${resumeData.personal.email} | ${resumeData.personal.phone} | ${resumeData.personal.location}
+                        </div>
+                    </div>
+                    
+                    <div class="section-heading">Professional Summary</div>
+                    <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.summary}</p>
+
+                    <div class="section-heading">Experience</div>
+                    <div style="margin-bottom:20px;">${expHtml}</div>
+                    
+                    <div class="section-heading">Skills</div>
+                    <p style="font-size:10pt; line-height:1.6; margin-bottom:20px;">${resumeData.skills.technical}</p>
+                    ${tplId === 'tpl-software' ? '<div style="color:#d4d4d4; margin-top:20px;">} // end resume</div>' : ''}
+                `;
+            }
+
+            calculateStrength();
+            triggerAutoSave();
+        }
+
+        // Strength Calculator
+        function calculateStrength() {
+            let score = 0;
+            if(resumeData.personal.fullName) score += 10;
+            if(resumeData.personal.jobTitle) score += 10;
+            if(resumeData.personal.email) score += 10;
+            if(resumeData.personal.phone) score += 10;
+            if(resumeData.summary && resumeData.summary.length > 50) score += 20;
+            if(resumeData.skills.technical) score += 15;
+            if(resumeData.experience && resumeData.experience.length > 0) score += 25;
+            
+            score = Math.min(score, 100);
+            document.getElementById('resumeProgressBar').style.width = score + '%';
+            document.getElementById('strengthText').textContent = score + '%';
+            
+            // Color changing based on score
+            const pb = document.getElementById('resumeProgressBar');
+            const st = document.getElementById('strengthText');
+            if(score < 40) { pb.style.background = '#ef4444'; st.style.color = '#ef4444'; }
+            else if(score < 70) { pb.style.background = '#f59e0b'; st.style.color = '#f59e0b'; }
+            else { pb.style.background = '#10b981'; st.style.color = '#10b981'; }
+            
+            // Sync ATS Score
+            resumeData.ats_score = score > 0 ? score - 5 : 0; // Simple mock correlation
+            document.getElementById('atsScoreDisplay').textContent = resumeData.ats_score;
+        }
+
+        // ── AI Power-ups ───────────────────────────────────────
+        async function generateAISummary() {
+            const role = document.querySelector('[data-field="personal.jobTitle"]').value || 'Professional';
+            const btn = document.querySelector('.btn-ai');
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Writing...";
+            
+            try {
+                const res = await fetch("{% url 'resume_builder:ai_summary' %}", {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ role: role })
+                });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    document.getElementById('summaryInput').value = data.summary;
+                    updatePreview();
+                }
+            } catch(e) { console.error(e); }
+            btn.innerHTML = "<i class='bx bx-magic-wand'></i> Write with AI";
+        }
+        
+        async function generateAIKeywords() {
+            const btn = document.querySelectorAll('.btn-ai')[1];
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Searching...";
+            
+            try {
+                const res = await fetch("{% url 'resume_builder:ai_keywords' %}", {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' }
+                });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    const current = document.getElementById('skillsInput').value;
+                    document.getElementById('skillsInput').value = current ? current + ", " + data.keywords : data.keywords;
+                    updatePreview();
+                }
+            } catch(e) { console.error(e); }
+            btn.innerHTML = "<i class='bx bx-search-alt-2'></i> Suggest ATS Keywords";
+        }
+
+        // Template Switcher
+        function switchTemplate(tplClass, btn) {
+            const canvas = document.getElementById('resumePreview');
+            canvas.className = 'resume-canvas ' + tplClass;
+            
+            // Update modal UI
+            document.querySelectorAll('.tpl-opt').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            
+            resumeData.templateId = tplClass;
+            triggerAutoSave();
+        }
+
+        // Accordion Toggle
+        function toggleSection(header) {
+            header.classList.toggle('active');
+            header.nextElementSibling.classList.toggle('active');
+        }
+
+        // QR Code Generation
+        function generateQRCode() {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            qrContainer.innerHTML = '';
+            // Mock sharing URL, in reality this would be a public endpoint /resumes/share/<uuid>
+            const url = window.location.origin + "/resumes/share/{{ resume.id }}";
+            document.getElementById('shareUrl').textContent = url;
+            
+            new QRCode(qrContainer, {
+                text: url,
+                width: 180,
+                height: 180,
+                colorDark : "#0f172a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            document.getElementById('qrModal').classList.add('show');
+        }
+
+        // Zoom Logic
+        let scale = 1.0;
+        function zoomIn() { scale += 0.1; document.getElementById('resumePreview').style.transform = `scale(${scale})`; }
+        function zoomOut() { scale -= 0.1; document.getElementById('resumePreview').style.transform = `scale(${scale})`; }
+
+        // SortableJS Drag & Drop
+        new Sortable(document.getElementById('sectionsContainer'), {
+            animation: 150,
+            handle: '.section-header', // drag handle
+            ghostClass: 'sortable-ghost'
+        });
+
+        // ── Auto-save Logic ────────────────────────────────────
+        let saveTimeout;
+        function triggerAutoSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => saveResume(false), 2000); // save after 2s of inactivity
+        }
+
+        async function saveResume(showNotification = true) {
+            const title = document.getElementById('resumeTitle').value;
+            
+            try {
+                const response = await fetch("{% url 'resume_builder:update_resume' resume.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        content: resumeData
+                    })
+                });
+                
+                if(response.ok && showNotification) {
+                    const toast = document.getElementById('saveToast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }
+            } catch (error) {
+                console.error("Save failed", error);
+            }
+        }
+        
+        // ── PDF Export ─────────────────────────────────────────
+        function exportPDF() {
+            const element = document.getElementById('resumePreview');
+            const title = document.getElementById('resumeTitle').value || 'Resume';
+            
+            // Temporarily reset scaling for perfect PDF rendering
+            const originalTransform = element.style.transform;
+            element.style.transform = 'scale(1)';
+            
+            const opt = {
+                margin:       0,
+                filename:     `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Show toast
+            const toast = document.getElementById('saveToast');
+            toast.textContent = "Generating PDF...";
+            toast.classList.add('show');
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.transform = originalTransform;
+                toast.textContent = "PDF Downloaded!";
+                setTimeout(() => toast.classList.remove('show'), 3000);
+                setTimeout(() => { toast.textContent = "Resume auto-saved successfully!"; }, 3500);
+            });
+        }
+        
+        // Initial setup for loaded template
+        if(resumeData.templateId) {
+            const canvas = document.getElementById('resumePreview');
+            canvas.className = 'resume-canvas ' + resumeData.templateId;
+            document.querySelectorAll('.tpl-opt').forEach(el => {
+                if(el.getAttribute('onclick').includes(resumeData.templateId)) {
+                    document.querySelectorAll('.tpl-opt').forEach(e => e.classList.remove('active'));
+                    el.classList.add('active');
+                }
+            });
+        }
+        
+        // Initial render
+        updatePreview();
+    </script>
+</body>
+</html>
